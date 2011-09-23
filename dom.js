@@ -83,7 +83,12 @@ ElementWrapper.prototype =
 	 */
 	append: function(html)
 	{
-		this.element.innerHTML += html;
+		var newContent = document.createElement('div');
+		newContent.innerHTML = html;
+		while (newContent.firstChild)
+		{
+			this.element.appendChild(newContent.firstChild);
+		}
 	},
 	
 	/**
