@@ -12,14 +12,14 @@ var Util =
 	/**
 	 * Add all elements from "a" to "b" and return the new "b"
 	 */
-	extend: function(b, a)
+	extend: function(destination, source)
 	{
-		for (var key in a || {})
+		for (var key in source || {})
 		{
-			if (a.hasOwnProperty(key))
-				b[key] = a[key];
+			if (source.hasOwnProperty(key))
+				destination[key] = source[key];
 		}
-		return b;
+		return destination;
 	},
 	
 	/**
@@ -88,3 +88,25 @@ var Browser =
 		return v > 4 ? v : undef;
 	}())
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Polyfills
+
+// Based off https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
+if (!Function.prototype.bind)
+{  
+	Function.prototype.bind = function (oThis)
+	{
+		var aArgs = Array.prototype.slice.call(arguments, 1),
+			fToBind = this,
+			fNOP = function () {},
+			fBound = function () {
+			  return fToBind.apply(this instanceof fNOP ? this : oThis || window, aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
+
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+
+		return fBound;
+	};  
+}  
