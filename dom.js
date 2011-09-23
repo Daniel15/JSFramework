@@ -17,6 +17,24 @@ var DOM =
 		var el = document.createElement(tag);
 		Util.extend(el, options);
 		return new ElementWrapper(el);
+	},
+	
+	/**
+	 * Get an element on the page and wrap it with useful functions
+	 * @param	ID of the element
+	 */
+	get: function(el)
+	{
+		// If it's already wrapped, just return the element
+		if (el instanceof ElementWrapper)
+			return el;
+		
+		// If it's a string, assume it's an ID
+		if (typeof(el) == "string")
+			return new ElementWrapper(document.getElementById(el));
+			
+		// Otherwise, assume it's an element
+		return new ElementWrapper(el);
 	}
 }
 
@@ -61,6 +79,14 @@ ElementWrapper.prototype =
 	},
 	
 	/**
+	 * Append some HTML to the element
+	 */
+	append: function(html)
+	{
+		this.element.innerHTML += html;
+	},
+	
+	/**
 	 * Add an event handler to this element.
 	 * Based off http://www.quirksmode.org/blog/archives/2005/10/_and_the_winner_1.html
 	 * @param	Type of event handler (eg. "click")
@@ -69,16 +95,63 @@ ElementWrapper.prototype =
 	addEvent: function(type, fn)
 	{
 		Events.add(this.element, type, fn);
+	},
+	
+	/**
+	 * Get the position of this element
+	 * @return	Hash with x and y values
+	 */
+	getPosition: function()
+	{
+		var obj = this.element,
+			x = 0,
+			y = 0;
+		do
+		{
+			x += obj.offsetLeft;
+			y += obj.offsetTop;
+		}
+		while (obj = obj.offsetParent);
+		
+		return {x: x, y: y};
+	},
+	
+	/**
+	 * Set a CSS style on this element
+	 * @param	Style to set
+	 * @param	New style value
+	 */
+	setStyle: function(style, value)
+	{
+		// TODO: Support converting hyphenated-keys to camelCase
+		this.element.style[style] = value;
+	},
+	
+	/**
+	 * Set multiple CSS styles at once
+	 * @param	Hash of styles
+	 */
+	setStyles: function(styles)
+	{
+		for (var key in styles)
+		{
+			this.setStyle(key, styles[key]);
+		}
+	},
+	
+	/***** Normal DOM method wrappers *****/
+	appendChild: function(newNode)
+	{
+		this.element.appendChild(newNode);
+	},
+	
+	getElementsByTagName: function(tag)
+	{
+		return this.element.getElementsByTagName(tag);
 	}
 }
 
-
-
 function $(el)
 {
-	// If it's already wrapped, just return the element
-	if (el instanceof ElementWrapper)
-		return el;
-		
-	return new ElementWrapper(document.getElementById(el));
+	return DOM.get(el);
 }

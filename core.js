@@ -9,6 +9,8 @@
  */
 var Util = 
 {
+	emptyFn: function() { },
+	
 	/**
 	 * Add all elements from "a" to "b" and return the new "b"
 	 */

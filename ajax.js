@@ -39,25 +39,6 @@ var Ajax = (function(window)
 		}
 	}
 	
-	/**
-	 * Handle AJAX response. Passes data to callback.
-	 * @param	Callback to pass data to
-	 * @param	Format data is in (json, xml, text)
-	 * @param	XMLHttpRequest response is coming from
-	 */
-	function handleResponse(callback, format, xhr)
-	{
-		if (format == 'json')
-		{
-			var data = JSON.parse(xhr.responseText);
-			callback(data, xhr);
-		}
-		else
-		{
-			callback(xhr.responseText, xhr);
-		}
-	}
-	
 	// No native JSON support (eg. Internet Explorer < 8)
 	// Very simple JSON.parse polyfill
 	if (!window.JSON)
@@ -96,7 +77,9 @@ var Ajax = (function(window)
 				onFailure: function() {},
 				onComplete: function() {},
 				format: 'json',
-				data: null
+				data: null,
+				// What "this" should be when callback is called
+				context: null
 			}, options);
 			
 			var xhr = this.currentRequest = getXHR();
@@ -109,7 +92,18 @@ var Ajax = (function(window)
 				// readyState 4 == complete
 				if (xhr.readyState == 4)
 				{
-					handleResponse((xhr.status == 200 ? options.onSuccess : options.onFailure), options.format, xhr);
+					var callback = xhr.status == 200 ? options.onSuccess : options.onFailure;
+					
+					if (options.format == 'json')
+					{
+						var data = JSON.parse(xhr.responseText);
+						callback.call(options.context, data, xhr);
+					}
+					else
+					{
+						callback.call(options.context, xhr.responseText, xhr);
+					}
+					
 					options.onComplete(xhr);
 				}
 			}
