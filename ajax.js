@@ -17,25 +17,16 @@ var Ajax = (function(window)
 		}
 	}
 	// Internet Explorer
+	// Reference: http://blogs.msdn.com/b/xmlteam/archive/2006/10/23/using-the-right-version-of-msxml-in-internet-explorer.aspx
 	else if (window.ActiveXObject)
 	{
 		getXHR = function()
 		{
-			try
-			{
-				return new ActiveXObject("Msxml2.XMLHTTP")
-			}
-			catch (e)
-			{
-				try
-				{
-					return new ActiveXObject("Microsoft.XMLHTTP") 
-				} 
-				catch (e) 
-				{
-					alert('Could not create AJAX requester!');
-				}
-			}
+			try { return new ActiveXObject("Msxml2.XMLHTTP.6.0") } catch (e) { }
+			try { return new ActiveXObject("Msxml2.XMLHTTP.3.0") } catch (e) { }
+			try { return new ActiveXObject("Microsoft.XMLHTTP") } catch (e) { }
+			
+			alert('Could not create AJAX requester!');
 		}
 	}
 	
