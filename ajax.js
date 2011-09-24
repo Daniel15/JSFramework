@@ -48,7 +48,7 @@ var Ajax = (function(window)
 		window.JSON.parse = function(data)
 		{
 			//\n's in JSON string, when evaluated will create errors in IE
-			var data = xhr.responseText.replace(/[\n\r]/g,"");
+			var data = data.replace(/[\n\r]/g,"");
 			return eval('(' + data + ')');
 		}
 	}
@@ -74,9 +74,9 @@ var Ajax = (function(window)
 			{
 				method: 'post',
 				onSuccess: function() {},
-				onFailure: function(text)
+				onFailure: function(text, xhr, e)
 				{
-					alert('Error occured while loading data: ' + text);
+					alert('Error occured while loading data: ' + text + ' [' + (e && e.message) + ']');
 				},
 				onComplete: function() {},
 				format: 'json',
@@ -105,7 +105,7 @@ var Ajax = (function(window)
 						}
 						catch (e)
 						{
-							options.onFailure.call(options.context, xhr.responseText, xhr);
+							options.onFailure.call(options.context, xhr.responseText, xhr, e);
 						}
 						callback.call(options.context, data, xhr);
 					}
