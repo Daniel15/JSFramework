@@ -6,35 +6,49 @@
 
 // Based off Simple JavaScript Templating by John Resig
 // http://ejohn.org/blog/javascript-micro-templating/
-/*
-(function(){
-   var cache = {};
-   
-   this.tmpl = function tmpl(str, data){
-
-   };
- })();*/
 var Template = 
 {
+	/**
+	 * Cache of all parsed templates
+	 */
 	cache: {},
-	get: function(str, data)
+	
+	/**
+	 * Get a template
+	 * @param	Name of the template
+	 * @param	(optional) Data to use in the template.
+	 * @return	If data is specified, call template with data and return its HTML. If data is not
+	 *          specified, return the template itself.
+	 */
+	get: function(name, data)
 	{
-		// Figure out if we're getting a template, or if we need to
-		// load the template - and be sure to cache the result.		
-		var fn = !/\W/.test(str) ?
-			this.cache[str] = this.cache[str] ||
-			this.get(document.getElementById(str).innerHTML) :
-       
+		// Get template either from cache, or parse it (if not in cache)
+		var tmpl = this.cache[name] || this.parse(name, document.getElementById(name).innerHTML);
+		
+		// If data was passed, use it in the template
+		// Otherwise, just return the template itself
+		return data ? tmpl(data) : tmpl;
+	},
+	
+	/**
+	 * Parse a template, returning a JavaScript function to execute it. Also caches the template in
+	 * case it's used later
+	 * @param	Name of the template, used to cache it
+	 * @param	Template code
+	 * @return	JavaScript function for executing the template
+	 */
+	parse: function(name, tmpl)
+	{
 		// Generate a reusable function that will serve as a template
 		// generator (and which will be cached).
-		new Function("obj",
+		var fn = new Function("obj",
 			"var p=[],print=function(){p.push.apply(p,arguments);};" +
          
 			// Introduce the data as local variables using with(){}
 			"with(obj){p.push('" +
          
 			// Convert the template into pure JavaScript
-			str
+			tmpl
 				.replace(/[\r\t\n]/g, " ")
 				.split("<%").join("\t")
 				.replace(/((^|%>)[^\t]*)'/g, "$1\r")
@@ -43,8 +57,7 @@ var Template =
 				.split("%>").join("p.push('")
 				.split("\r").join("\\'")
 			+ "');}return p.join('');");
-     
-		// Provide some basic currying to the user
-		return data ? fn( data ) : fn;
+
+		return this.cache[name] = fn;
 	}
 };
