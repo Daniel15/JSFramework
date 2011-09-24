@@ -74,7 +74,10 @@ var Ajax = (function(window)
 			{
 				method: 'post',
 				onSuccess: function() {},
-				onFailure: function() {},
+				onFailure: function(text)
+				{
+					alert('Error occured while loading data: ' + text);
+				},
 				onComplete: function() {},
 				format: 'json',
 				data: null,
@@ -96,7 +99,14 @@ var Ajax = (function(window)
 					
 					if (options.format == 'json')
 					{
-						var data = JSON.parse(xhr.responseText);
+						try
+						{
+							var data = JSON.parse(xhr.responseText);
+						}
+						catch (e)
+						{
+							options.onFailure.call(options.context, xhr.responseText, xhr);
+						}
 						callback.call(options.context, data, xhr);
 					}
 					else

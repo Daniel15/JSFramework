@@ -10,13 +10,17 @@ var DOM =
 	 * Create and return a new wrapped DOM element
 	 * @param	Tag name to create (eg. "span")
 	 * @param	Properties to set on the new element
+	 * @param	Whether to extend the element or not
 	 * @return ElementWrapper The new element
 	 */
-	create: function(tag, options)
+	create: function(tag, options, extend)
 	{
+		if (extend == undefined)
+			extend = true;
+			
 		var el = document.createElement(tag);
 		Util.extend(el, options);
-		return new ElementWrapper(el);
+		return extend ? new ElementWrapper(el) : el;
 	},
 	
 	/**
@@ -57,6 +61,7 @@ ElementWrapper.prototype =
 	set: function(key, value)
 	{
 		this.element[key] = value;
+		return this;
 	},
 	
 	/**
@@ -76,6 +81,7 @@ ElementWrapper.prototype =
 	insertAfter: function(newNode)
 	{
 		this.element.parentNode.insertBefore(newNode.element, this.element.nextSibling);
+		return this;
 	},
 	
 	/**
@@ -89,6 +95,7 @@ ElementWrapper.prototype =
 		{
 			this.element.appendChild(newContent.firstChild);
 		}
+		return this;
 	},
 	
 	/**
@@ -100,6 +107,7 @@ ElementWrapper.prototype =
 	addEvent: function(type, fn)
 	{
 		Events.add(this.element, type, fn);
+		return this;
 	},
 	
 	/**
@@ -130,6 +138,7 @@ ElementWrapper.prototype =
 	{
 		// TODO: Support converting hyphenated-keys to camelCase
 		this.element.style[style] = value;
+		return this;
 	},
 	
 	/**
@@ -142,12 +151,20 @@ ElementWrapper.prototype =
 		{
 			this.setStyle(key, styles[key]);
 		}
+		return this;
 	},
 	
 	/***** Normal DOM method wrappers *****/
 	appendChild: function(newNode)
 	{
 		this.element.appendChild(newNode);
+		return this;
+	},
+	
+	removeChild: function(node)
+	{
+		this.element.removeChild(node);
+		return this;
 	},
 	
 	getElementsByTagName: function(tag)
