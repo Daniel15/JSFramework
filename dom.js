@@ -154,6 +154,37 @@ ElementWrapper.prototype =
 		return this;
 	},
 	
+	/**
+	 * Check if this element has the specified CSS class name
+	 * @param	Class name to look for
+	 * @return	Whether this element has this class name as one of its classes
+	 */
+	hasClass: function(name)
+	{
+		return (' ' + this.element.className.toUpperCase() + ' ').indexOf(' ' + name.toUpperCase() + ' ') > -1;
+	},
+	
+	/**
+	 * Add the specified class name to this element
+	 * @param	Class name to add
+	 */
+	addClass: function(name)
+	{
+		this.element.className += ' ' + name;
+		return this;
+	},
+	
+	/**
+	 * Remove the specified class name from this element
+	 * @param	Class name to remove
+	 */
+	removeClass: function(name)
+	{
+		var newClass = (' ' + this.element.className + ' ').replace(' ' + name + '', '');
+		this.element.className = newClass.trim();
+		return this;
+	},	
+	
 	/***** Normal DOM method wrappers *****/
 	appendChild: function(newNode)
 	{
