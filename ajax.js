@@ -66,7 +66,7 @@ var Ajax = (function(window)
 			// Abort any current request
 			if (this.currentRequest)
 			{
-				this.currentRequest.onreadystatechange = null;
+				this.currentRequest.onreadystatechange = Util.emptyFn;
 				this.currentRequest.abort();
 			}
 			
@@ -115,6 +115,7 @@ var Ajax = (function(window)
 					}
 					
 					options.onComplete(xhr);
+					this.currentRequest = null;
 				}
 			}
 			xhr.send(Util.buildQueryString(options.data));

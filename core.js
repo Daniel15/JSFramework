@@ -42,7 +42,7 @@ var Util =
 				{
 					for (var i = 0, count = data[key].length; i < count; i++)
 					{
-						result.push(key + '[]=' + data[key][i]);
+						result.push(key + '[]=' + encodeURIComponent(data[key][i]));
 					}
 				}
 				// Add objects in PHP notation - key[innerKey1]=value1&key[innerKey2]=value2
@@ -52,13 +52,13 @@ var Util =
 					{
 						if (data.hasOwnProperty(key))
 						{
-							result.push(key + '[' + innerKey + ']=' + data[key][innerKey]);
+							result.push(key + '[' + innerKey + ']=' + encodeURIComponent(data[key][innerKey]));
 						}
 						
 					}
 				}
 				else
-					result.push(key + '=' + data[key]);
+					result.push(key + '=' + encodeURIComponent(data[key]));
 			}
 		}
 		
