@@ -6,6 +6,11 @@
  
 var DOM =
 {
+	/** Cache of ElementWrappers */
+	cache: [],
+	/** Name of the attribute used to store an element ID number in the cache */
+	JS_ELEMENT_ID: 'js-element-id',
+	
 	/**
 	 * Create and return a new wrapped DOM element
 	 * @param	Tag name to create (eg. "span")
@@ -35,10 +40,17 @@ var DOM =
 		
 		// If it's a string, assume it's an ID
 		if (typeof(el) == "string")
-			return new ElementWrapper(document.getElementById(el));
+			el = document.getElementById(el);
 			
-		// Otherwise, assume it's an element
-		return new ElementWrapper(el);
+		// Check if a wrapper was already created for this
+		var elId = el.getAttribute(this.JS_ELEMENT_ID);
+		if (elId)
+			return this.cache[elId];
+			
+		// Otherwise, create a new wrapper and cache it
+		var wrapper = new ElementWrapper(el);
+		el.setAttribute(this.JS_ELEMENT_ID, this.cache.push(wrapper) - 1);
+		return wrapper;
 	}
 }
 
@@ -48,7 +60,6 @@ var DOM =
 function ElementWrapper(element)
 {
 	this.element = element;
-	
 }
 
 ElementWrapper.prototype =
