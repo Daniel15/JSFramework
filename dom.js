@@ -15,17 +15,17 @@ var DOM =
 	 * Create and return a new wrapped DOM element
 	 * @param	Tag name to create (eg. "span")
 	 * @param	Properties to set on the new element
-	 * @param	Whether to extend the element or not
-	 * @return ElementWrapper The new element
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return The new element (or a wrapper if wrap is true)
 	 */
-	create: function(tag, options, extend)
+	create: function(tag, options, wrap)
 	{
-		if (extend == undefined)
-			extend = true;
+		if (wrap == undefined)
+			wrap = true;
 			
 		var el = document.createElement(tag);
 		Util.extend(el, options);
-		return extend ? new ElementWrapper(el) : el;
+		return wrap ? new ElementWrapper(el) : el;
 	},
 	
 	/**
@@ -194,11 +194,48 @@ ElementWrapper.prototype =
 		var newClass = (' ' + this.element.className + ' ').replace(' ' + name + '', '');
 		this.element.className = newClass.trim();
 		return this;
-	},	
+	},
+
+	/**
+	 * Get a single child element by tag name
+	 * @param	Tag name to get
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return	The element, or a wrapper around it if wrap is true.
+	 */
+	getByTag: function(tag, wrap)
+	{
+		if (wrap == undefined)
+			wrap = true;
+		
+		// TODO: Error handling here.
+		var el = this.element.getElementsByTagName(tag)[0]
+		return wrap ? new ElementWrapper(el) : el;
+	},
+	
+	/**
+	 * Remove this element from the DOM.
+	 */
+	remove: function()
+	{
+		// Ensure the wrapper is removed from the cache
+		DOM.cache[this.element.getAttribute(DOM.JS_ELEMENT_ID)] = null;
+		
+		// Actually delete it
+		this.element.parentNode.removeChild(this.element);
+		delete this.element;
+	},
+	
+	cloneNode: function(deep)
+	{
+		return new ElementWrapper(this.element.cloneNode(deep));
+	},
 	
 	/***** Normal DOM method wrappers *****/
 	appendChild: function(newNode)
 	{
+		if (newNode instanceof ElementWrapper)
+			newNode = newNode.element;
+		
 		this.element.appendChild(newNode);
 		return this;
 	},

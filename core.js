@@ -12,7 +12,9 @@ var Util =
 	emptyFn: function() { },
 	
 	/**
-	 * Add all elements from "a" to "b" and return the new "b"
+	 * Add all elements from source to destination and return the modified destination (for chaining)
+	 * @param	Object to copy properties to
+	 * @param	Object to copy properties from
 	 */
 	extend: function(destination, source)
 	{
