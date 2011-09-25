@@ -42,7 +42,7 @@ var Template =
 		// Generate a reusable function that will serve as a template
 		// generator (and which will be cached).
 		var fn = new Function("obj",
-			"var p=[],print=function(){p.push.apply(p,arguments);};" +
+			"var p=[];" +
          
 			// Introduce the data as local variables using with(){}
 			"with(obj){p.push('" +
