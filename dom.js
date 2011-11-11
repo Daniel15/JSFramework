@@ -18,19 +18,30 @@ var DOM =
 	 * @param	Whether to wrap the element or not. Optional, default is true
 	 * @return The new element (or a wrapper if wrap is true)
 	 */
-	create: function(tag, options, wrap)
+	create: function(tag, properties, wrap, attributes)
 	{
 		if (wrap == undefined)
 			wrap = true;
 			
 		var el = document.createElement(tag);
-		Util.extend(el, options);
-		return wrap ? new ElementWrapper(el) : el;
+		Util.extend(el, properties);
+		if (attributes)
+		{
+			for (var i in attributes)
+			{
+				if (attributes.hasOwnProperty(i))
+				{
+					el.setAttribute(i, attributes[i]);
+				}
+			}
+		}
+		return wrap ? DOM.get(el) : el;
 	},
 	
 	/**
 	 * Get an element on the page and wrap it with useful functions
 	 * @param	ID of the element
+	 * @return	An ElementWrapper instance
 	 */
 	get: function(el)
 	{
@@ -51,6 +62,23 @@ var DOM =
 		var wrapper = new ElementWrapper(el);
 		el.setAttribute(this.JS_ELEMENT_ID, this.cache.push(wrapper) - 1);
 		return wrapper;
+	},
+	
+	/**
+	 * Wrap all the passed elements
+	 * TODO: Use custom array class instead of a normal array?
+	 * @param	Array of elements
+	 * @return	Array of wrapped elements
+	 */
+	wrapAll: function(input)
+	{
+		var output = [];
+		for (var i = 0, count = input.length; i < count; i++)
+		{
+			output.push(DOM.get(input[i]));
+		}
+		
+		return output;
 	}
 }
 
@@ -111,7 +139,6 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Add an event handler to this element.
-	 * Based off http://www.quirksmode.org/blog/archives/2005/10/_and_the_winner_1.html
 	 * @param	Type of event handler (eg. "click")
 	 * @param	Function for handling these events
 	 */
@@ -195,22 +222,82 @@ ElementWrapper.prototype =
 		this.element.className = newClass.trim();
 		return this;
 	},
-
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// TODO: Clean up the below blocks of code. Remove duplication.
+	
 	/**
-	 * Get a single child element by tag name
+	 * Get the first child element by tag name, or null if there is no matching child
 	 * @param	Tag name to get
 	 * @param	Whether to wrap the element or not. Optional, default is true
 	 * @return	The element, or a wrapper around it if wrap is true.
+	 */
+	firstByTag: function(tag, wrap)
+	{
+		if (wrap == undefined)
+			wrap = true;
+			
+		var els = this.getByTag(tag, false);
+		return els && els[0] && (wrap ? DOM.get(els[0]) : els[0]);
+	},
+	
+	/**
+	 * Get all children by tag name
+	 * @param	Tag name to get
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return	An array of element, or wrappers around them if wrap is true.
 	 */
 	getByTag: function(tag, wrap)
 	{
 		if (wrap == undefined)
 			wrap = true;
+			
+		var els = this.element.getElementsByTagName(tag);
 		
-		// TODO: Error handling here.
-		var el = this.element.getElementsByTagName(tag)[0]
-		return wrap ? new ElementWrapper(el) : el;
+		if (!els)
+			return [];
+			
+		return wrap ? DOM.wrapAll(els) : els;
 	},
+	
+	/**
+	 * Get the first child element by class name, or null if there is no matching child
+	 * @param	Tag name to get
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return	The element, or a wrapper around it if wrap is true.
+	 */
+	firstByClass: function(className, wrap)
+	{
+		if (wrap == undefined)
+			wrap = true;
+			
+		var els = this.getByClass(className, false);
+		return els && els[0] && (wrap ? DOM.get(els[0]) : els[0]);
+	},
+	
+	
+	/**
+	 * Get all children by class name
+	 * @param	Tag name to get
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return	An array of element, or wrappers around them if wrap is true.
+	 */
+	getByClass: function(className, wrap)
+	{
+		if (wrap == undefined)
+			wrap = true;
+			
+		// TODO: Polyfill for IE
+		var els = this.element.getElementsByClassName(className);
+		
+		if (!els)
+			return [];
+			
+		return wrap ? DOM.wrapAll(els) : els;
+	},
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Remove this element from the DOM.
@@ -223,6 +310,18 @@ ElementWrapper.prototype =
 		// Actually delete it
 		this.element.parentNode.removeChild(this.element);
 		delete this.element;
+	},
+	
+	/**
+	 * Add a child to the start of this element
+	 * @param	New element to add
+	 */
+	prependChild: function(newNode)
+	{
+		if (newNode instanceof ElementWrapper)
+			newNode = newNode.element;
+		
+		this.element.insertBefore(newNode, this.element.firstChild);
 	},
 	
 	cloneNode: function(deep)
@@ -244,13 +343,11 @@ ElementWrapper.prototype =
 	{
 		this.element.removeChild(node);
 		return this;
-	},
-	
-	getElementsByTagName: function(tag)
-	{
-		return this.element.getElementsByTagName(tag);
 	}
 }
+
+// Body is used frequently
+DOM.body = DOM.get(document.body);
 
 function $(el)
 {

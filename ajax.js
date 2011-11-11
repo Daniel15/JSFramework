@@ -53,14 +53,7 @@ var Ajax = (function(window)
 		 * @todo Document available options
 		 */
 		load: function(url, options)
-		{
-			// Abort any current request
-			if (this.currentRequest)
-			{
-				this.currentRequest.onreadystatechange = Util.emptyFn;
-				this.currentRequest.abort();
-			}
-			
+		{			
 			options = Util.extend(
 			{
 				method: 'post',
@@ -73,8 +66,16 @@ var Ajax = (function(window)
 				format: 'json',
 				data: null,
 				// What "this" should be when callback is called
-				context: null
+				context: null,
+				abortPrev: false
 			}, options);
+			
+			// Abort any current request if required
+			if (options.abortPrev && this.currentRequest)
+			{
+				this.currentRequest.onreadystatechange = Util.emptyFn;
+				this.currentRequest.abort();
+			}
 			
 			var xhr = this.currentRequest = getXHR();
 			xhr.open(options.method, url, true);
