@@ -197,7 +197,7 @@ ElementWrapper.prototype =
 	 */
 	hasClass: function(name)
 	{
-		return (' ' + this.element.className.toUpperCase() + ' ').indexOf(' ' + name.toUpperCase() + ' ') > -1;
+		return (' ' + (this.element || this).className.toUpperCase() + ' ').indexOf(' ' + name.toUpperCase() + ' ') > -1;
 	},
 	
 	/**
@@ -281,10 +281,52 @@ ElementWrapper.prototype =
 		if (wrap == undefined)
 			wrap = true;
 			
-		// TODO: Polyfill for IE
-		var els = this.element.getElementsByClassName(className);			
+		var els = this._getByClass(this.element, className);			
 		return wrap ? DOM.wrapAll(els) : els;
 	},
+	
+	/**
+	 * Internal function for getting elements by class name. Don't use externally (use getByClass
+	 * instead)
+	 */
+	_getByClass: (function()
+	{
+		var tempEl = document.createElement('div');
+		// Normal browsers
+		if ('getElementsByClassName' in tempEl)
+		{
+			return function(el, className)
+			{
+				return el.getElementsByClassName(className);
+			}
+		}
+		// IE8 supports querySelectorAll but not getElementsByClassName
+		if ('querySelectorAll' in tempEl)
+		{
+			return function(el, className)
+			{
+				return el.querySelectorAll('.' + className);
+			}
+		}
+		// IE 6 and 7... Naive polyfill
+		// TODO: Unit test this!!
+		return function(el, className)
+		{
+			var els = el.all || el.getElementsByTagName('*');
+			var result = [];
+			var hasClass = ElementWrapper.prototype.hasClass;
+			
+			for (var i = 0, count = els.length; i < count; i++)
+			{
+				if (hasClass.call(els[i], className))
+				{
+					result.push(els[i]);
+				}
+			}
+			
+			return result;
+		}
+	})(),
 	
 	/**
 	 * Get the first child element by a selector or null if there is no matching child
