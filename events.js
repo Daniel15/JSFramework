@@ -36,7 +36,12 @@ var Events = (function()
 				obj[type+fn] = function()
 				{
 					var e = window.event;
+					// target - What actually triggered the event
 					e.target = e.srcElement;
+					// currentTarget - Where the event has bubbled up to (always the object the
+					// handler is attached to)
+					// Reference: https://developer.mozilla.org/en/DOM/event.currentTarget
+					e.currentTarget = obj;
 					obj['e'+type+fn](e);
 				}
 				obj.attachEvent('on'+type, obj[type+fn]);
@@ -138,7 +143,6 @@ var EventDelegation =
 	 */
 	handle: function(e)
 	{
-		// TODO: Handle IE6-8 which don't support currentTarget
 		var container = $(e.currentTarget);
 		var containerId = container.getElementId();
 		var target = $(e.target);
