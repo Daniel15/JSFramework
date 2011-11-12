@@ -28,11 +28,17 @@ var Events = (function()
 	else
 	{
 		// Based off http://www.quirksmode.org/blog/archives/2005/10/_and_the_winner_1.html
+		// Modified to set target using srcElement
 		eventHandling = {
 			add: function(obj, type, fn)
 			{
 				obj['e'+type+fn] = fn;
-				obj[type+fn] = function() { obj['e'+type+fn]( window.event ); }
+				obj[type+fn] = function()
+				{
+					var e = window.event;
+					e.target = e.srcElement;
+					obj['e'+type+fn](e);
+				}
 				obj.attachEvent('on'+type, obj[type+fn]);
 			},
 			stop: function(e)
