@@ -93,6 +93,15 @@ function ElementWrapper(element)
 ElementWrapper.prototype =
 {
 	/**
+	 * Gets the internal element ID for this element. This is *not* the id in the HTML!
+	 * @return The element ID
+	 */
+	getElementId: function()
+	{
+		return this.element.getAttribute(DOM.JS_ELEMENT_ID);
+	},
+	
+	/**
 	 * Set a property on this element
 	 * @param	Property name
 	 * @param	Value to set
@@ -134,17 +143,6 @@ ElementWrapper.prototype =
 		{
 			this.element.appendChild(newContent.firstChild);
 		}
-		return this;
-	},
-	
-	/**
-	 * Add an event handler to this element.
-	 * @param	Type of event handler (eg. "click")
-	 * @param	Function for handling these events
-	 */
-	addEvent: function(type, fn)
-	{
-		Events.add(this.element, type, fn);
 		return this;
 	},
 	
@@ -254,10 +252,6 @@ ElementWrapper.prototype =
 			wrap = true;
 			
 		var els = this.element.getElementsByTagName(tag);
-		
-		if (!els)
-			return [];
-			
 		return wrap ? DOM.wrapAll(els) : els;
 	},
 	
@@ -276,10 +270,9 @@ ElementWrapper.prototype =
 		return els && els[0] && (wrap ? DOM.get(els[0]) : els[0]);
 	},
 	
-	
 	/**
 	 * Get all children by class name
-	 * @param	Tag name to get
+	 * @param	Class name to get
 	 * @param	Whether to wrap the element or not. Optional, default is true
 	 * @return	An array of element, or wrappers around them if wrap is true.
 	 */
@@ -289,15 +282,52 @@ ElementWrapper.prototype =
 			wrap = true;
 			
 		// TODO: Polyfill for IE
-		var els = this.element.getElementsByClassName(className);
+		var els = this.element.getElementsByClassName(className);			
+		return wrap ? DOM.wrapAll(els) : els;
+	},
+	
+	/**
+	 * Get the first child element by a selector or null if there is no matching child
+	 * @param	Tag name to get
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return	The element, or a wrapper around it if wrap is true.
+	 */
+	firstBySelector: function(className, wrap)
+	{
+		if (wrap == undefined)
+			wrap = true;
 		
-		if (!els)
-			return [];
+		// TODO: Polyfill for IE
+		var el = this.element.querySelectorAll(selectors);
+		return el && (wrap ? DOM.get(el) : el);
+	},
+	
+	/**
+	 * Get all children by selector
+	 * @param	Selector to use
+	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * @return	An array of element, or wrappers around them if wrap is true.
+	 */
+	getBySelector: function(selectors, wrap)
+	{
+		if (wrap == undefined)
+			wrap = true;
 			
+		// TODO: Polyfill for IE
+		var els = this.element.querySelectorAll(selectors);
 		return wrap ? DOM.wrapAll(els) : els;
 	},
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Get all the children of this element
+	 * @return Array of the children
+	 */
+	children: function()
+	{
+		return DOM.wrapAll(this.element.children);
+	},
 	
 	/**
 	 * Remove this element from the DOM.
@@ -322,6 +352,7 @@ ElementWrapper.prototype =
 			newNode = newNode.element;
 		
 		this.element.insertBefore(newNode, this.element.firstChild);
+		return this;
 	},
 	
 	cloneNode: function(deep)
@@ -330,6 +361,15 @@ ElementWrapper.prototype =
 	},
 	
 	/***** Normal DOM method wrappers *****/
+	setAttribute: function(attribute, value)
+	{
+		this.element.setAttribute(attribute, value);
+		return this;
+	},
+	getAttribute: function(attribute)
+	{
+		return this.element.getAttribute(attribute);
+	},
 	appendChild: function(newNode)
 	{
 		if (newNode instanceof ElementWrapper)

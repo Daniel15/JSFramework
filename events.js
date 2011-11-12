@@ -86,6 +86,106 @@ var Events = (function()
 				// Call the init method if it exists
 				obj[piece] && obj[piece].init && obj[piece].init();
 			}
-		}
+		},
 	});
 })();
+
+var EventDelegation = 
+{
+	delegates: {},
+	/**
+	 * Attach a handler to all tagNames with a class of className, by attaching the event 
+	 * listener to containerEl. Works for both current elements, and new elements added in the
+	 * future.
+	 * @param	Element		Container element to add event listener to
+	 * @param	String		Type of event listener (eg. "click")
+	 * @param	String		Tag name to add events to (eg. "a")
+	 * @param	String		Class name to add events to, or null for none
+	 * @param	String		Event handler function
+	 */
+	add: function(containerEl, type, tagName, className, fn)
+	{
+		// Relies on ElementWrappers being cached, will break if they're not cached any more.
+		// This is the internal unique ID, *not* the id in the HTML!
+		var id = containerEl.getElementId();
+		
+		// Check if we have delegates for this element already
+		if (!this.delegates[id])
+		{
+			this.delegates[id] = {};
+		}
+		
+		// Check if we have delegates for this type already
+		if (!this.delegates[id][type])
+		{
+			this.delegates[id][type] = [];
+			// Add the handler
+			containerEl.addEvent(type, this.handle.bind(this));
+		}
+		
+		this.delegates[id][type].push({tagName: tagName.toUpperCase(), className: className, fn: fn});
+	},
+	
+	/**
+	 * Handle a delegated event
+	 * @param	Event data
+	 */
+	handle: function(e)
+	{
+		// TODO: Handle IE6-8 which don't support currentTarget
+		var container = $(e.currentTarget);
+		var containerId = container.getElementId();
+		var target = $(e.target);
+		
+		if (!this.delegates[containerId] || !this.delegates[containerId][e.type])
+		{
+			// TODO: Remove this debug message
+			alert('Couldn\'t find delegate for ' + container.getElementId());
+			return;
+		}
+		
+		var delegates = this.delegates[containerId][e.type];
+		for (var i = 0, count = delegates.length; i < count; i++)
+		{
+			var del = delegates[i];
+			
+			// Check that tag name is the same
+			if (target.get('nodeName').toUpperCase() == del.tagName 
+			// Check that class name is the same, IF a class name was specified
+				&& (!del.className || target.hasClass(del.className)))
+			{
+				del.fn.call(target, e);
+			}
+		}
+	}
+};
+
+// Extend the element wrapper prototype
+Util.extend(ElementWrapper.prototype, 
+{
+	/**
+	 * Add an event handler to this element.
+	 * @param	Type of event handler (eg. "click")
+	 * @param	Function for handling these events
+	 */
+	addEvent: function(type, fn)
+	{
+		Events.add(this.element, type, fn);
+		return this;
+	},
+	
+	/**
+	 * Add a delegated event handler to this element. Attach a handler to all tagNames with a class
+	 * of className, by attaching the event listener to "this" element. Works for both current 
+	 * elements, and new elements added in the future.
+	 * @param	String		Type of event listener (eg. "click")
+	 * @param	String		Tag name to add events to (eg. "a")
+	 * @param	String		Class name to add events to, or null for none
+	 * @param	String		Event handler function
+	 */
+	addDelegate: function(type, tagName, className, fn)
+	{
+		EventDelegation.add(this, type, tagName, className, fn);
+		return this;
+	}
+});
