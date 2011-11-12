@@ -86,7 +86,7 @@ var Events = (function()
 				// Call the init method if it exists
 				obj[piece] && obj[piece].init && obj[piece].init();
 			}
-		},
+		}
 	});
 })();
 
