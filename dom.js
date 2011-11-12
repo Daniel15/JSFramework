@@ -35,16 +35,19 @@ var DOM =
 				}
 			}
 		}
-		return wrap ? DOM.get(el) : el;
+		return wrap ? DOM.wrap(el) : el;
 	},
 	
 	/**
-	 * Get an element on the page and wrap it with useful functions
+	 * Wrap an element with useful functions
 	 * @param	ID of the element
 	 * @return	An ElementWrapper instance
 	 */
-	get: function(el)
+	wrap: function(el)
 	{
+		if (!el)
+			return null;
+			
 		// If it's already wrapped, just return the element
 		if (el instanceof ElementWrapper)
 			return el;
@@ -75,7 +78,7 @@ var DOM =
 		var output = [];
 		for (var i = 0, count = input.length; i < count; i++)
 		{
-			output.push(DOM.get(input[i]));
+			output.push(DOM.wrap(input[i]));
 		}
 		
 		return output;
@@ -237,7 +240,7 @@ ElementWrapper.prototype =
 			wrap = true;
 			
 		var els = this.getByTag(tag, false);
-		return els && els[0] && (wrap ? DOM.get(els[0]) : els[0]);
+		return els && els[0] && (wrap ? DOM.wrap(els[0]) : els[0]);
 	},
 	
 	/**
@@ -267,7 +270,7 @@ ElementWrapper.prototype =
 			wrap = true;
 			
 		var els = this.getByClass(className, false);
-		return els && els[0] && (wrap ? DOM.get(els[0]) : els[0]);
+		return els && els[0] && (wrap ? DOM.wrap(els[0]) : els[0]);
 	},
 	
 	/**
@@ -341,7 +344,7 @@ ElementWrapper.prototype =
 		
 		// TODO: Polyfill for IE
 		var el = this.element.querySelectorAll(selectors);
-		return el && (wrap ? DOM.get(el) : el);
+		return el && (wrap ? DOM.wrap(el) : el);
 	},
 	
 	/**
@@ -370,6 +373,85 @@ ElementWrapper.prototype =
 	{
 		return DOM.wrapAll(this.element.children);
 	},
+	
+	/**
+	 * Get the parent element of this element. If a tag name is passed, get the first parent that
+	 * matches this tag name.
+	 * @param	String		Name of tag to look for
+	 * @param	The parent element
+	 */
+	parent: function(tagName)
+	{
+		if (!tagName)
+			return DOM.wrap(this.element.parentNode);
+			
+		tagName = tagName.toUpperCase();
+		var parent = this.element.parentNode;
+		while (parent && parent.nodeName.toUpperCase() != tagName)
+			parent = parent.parentNode;
+			
+		return DOM.wrap(parent);
+	},
+	
+	/**
+	 * Get the sibling element before this one
+	 */
+	previous: (function()
+	{
+		var tempEl = document.createElement('div');
+		if ('previousElementSibling' in tempEl)
+		{
+			return function()
+			{
+				return DOM.wrap(this.element.previousElementSibling);
+			}
+		}
+		else
+		{
+			return function()
+			{
+				var sibling = this.element;
+				while (sibling = sibling.previousSibling)
+				{
+					if (sibling.nodeType === 1)
+					{
+						return DOM.wrap(sibling);
+					}
+				}
+				return null;
+			}
+		}
+	})(),
+	
+	/**
+	 * Get the sibling element after this one
+	 */
+	next: (function()
+	{
+		var tempEl = document.createElement('div');
+		if ('nextElementSibling' in tempEl)
+		{
+			return function()
+			{
+				return DOM.wrap(this.element.nextElementSibling);
+			}
+		}
+		else
+		{
+			return function()
+			{
+				var sibling = this.element;
+				while (sibling = sibling.nextSibling)
+				{
+					if (sibling.nodeType === 1)
+					{
+						return DOM.wrap(sibling);
+					}
+				}
+				return null;
+			}
+		}
+	})(),
 	
 	/**
 	 * Remove this element from the DOM.
@@ -429,9 +511,9 @@ ElementWrapper.prototype =
 }
 
 // Body is used frequently
-DOM.body = DOM.get(document.body);
+DOM.body = DOM.wrap(document.body);
 
 function $(el)
 {
-	return DOM.get(el);
+	return DOM.wrap(el);
 }
