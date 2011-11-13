@@ -1,4 +1,4 @@
-/**
+/** @preserve
  * Daniel15 JavaScript Framework - By Daniel15, 2011
  * http://dl.vc/jsframework
  * Feel free to use any of this, but please link back to my site (dan.cx)
@@ -92,6 +92,15 @@ var Browser =
 		return v > 4 ? v : undef;
 	}())
 };
+
+// Function extensions
+Util.extend(Function.prototype, 
+{
+	delay: function(delay)
+	{
+		return setTimeout(this, delay);
+	}
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // Polyfills
