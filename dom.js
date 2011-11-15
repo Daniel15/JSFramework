@@ -69,7 +69,6 @@ var DOM =
 	
 	/**
 	 * Wrap all the passed elements
-	 * TODO: Use custom array class instead of a normal array?
 	 * @param	Array of elements
 	 * @return	Array of wrapped elements
 	 */

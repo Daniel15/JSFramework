@@ -149,8 +149,6 @@ var EventDelegation =
 		
 		if (!this.delegates[containerId] || !this.delegates[containerId][e.type])
 		{
-			// TODO: Remove this debug message
-			alert('Couldn\'t find delegate for ' + container.getElementId());
 			return;
 		}
 		
