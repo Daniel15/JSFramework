@@ -75,13 +75,7 @@ var DOM =
 	 */
 	wrapAll: function(input)
 	{
-		var output = [];
-		for (var i = 0, count = input.length; i < count; i++)
-		{
-			output.push(DOM.wrap(input[i]));
-		}
-		
-		return output;
+		return new ElementWrapperList(input);
 	}
 }
 
@@ -512,8 +506,52 @@ ElementWrapper.prototype =
 
 // Body is used frequently
 DOM.body = DOM.wrap(document.body);
+// Helper function (a la Prototype, MooTools, jQuery, etc.)
+function $(el) { return DOM.wrap(el); }
 
-function $(el)
+/**
+ * List containing multiple elements, similar to an array. Allows calling methods like setStyle and
+ * addClass, which automatically call this method on every element in the list
+ */
+function ElementWrapperList(items)
 {
-	return DOM.wrap(el);
+	// Add the items from the passed array
+	for (var i = 0, count = items.length; i < count; i++)
+		this[i] = DOM.wrap(items[i]);
+	
+	this.length = items.length;
 }
+
+ElementWrapperList.prototype = {
+	/**
+	 * Convert this list into a proper array
+	 * @return	Array	An array with the same elements as this list
+	 */
+	toArray: function()
+	{
+		return Array.prototype.slice.call(this);
+	}
+};
+
+// Add all the functions that would make sense if called on a list of elements
+(function()
+{
+	var toAdd = ['set', 'setAttribute', 'remove', 'addClass', 'removeClass', 'setStyle', 'setStyles'];
+	
+	for (var i = 0, count = toAdd.length; i < count; i++)
+	{
+		var func = toAdd[i];
+		// Create a wrapper for this function
+		ElementWrapperList.prototype[func] = (function(functionName)
+		{
+			return function()
+			{
+				for (var i = 0; i < this.length; i++)
+				{
+					this[i][functionName].apply(this[i], arguments);
+				}
+				return this;
+			}
+		})(func);
+	}
+})();
