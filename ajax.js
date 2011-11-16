@@ -30,7 +30,7 @@ var Ajax = function(url, options)
 		onComplete: Util.emptyFn,
 		format: 'json',
 		data: null,
-		context: null,
+		context: null
 	}, options);
 }
 
@@ -55,7 +55,7 @@ Ajax.prototype =
 			this.currentRequest.abort();
 		}
 		
-		var xhr = this.currentRequest = this.getXHR();
+		var xhr = this.currentRequest = this._getXHR();
 		xhr.open(this.options.method, this.url, true);
 		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 		if (this.options.method == 'post')
