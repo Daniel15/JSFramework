@@ -5,7 +5,13 @@
  */
  
 /**
- * Create a new AJAX requester
+ * Create a new AJAX requester. The options available are as follows:
+ *  - method: POST or GET
+ *  - onSuccess, onFailure, onComplete: Callbacks for when the specified event happens
+ *  - format: json or text, format to interpret result as
+ *  - data: GET or POST data to send when doing request
+ *  - context: What "this" should be when callback is called
+ *
  * @param	String		URL to load
  * @param	Object		Options
  * @todo Document options
@@ -16,18 +22,15 @@ var Ajax = function(url, options)
 	this.currentRequest = null;
 	this.options = Util.extend(
 	{
+		// Default options:
 		method: 'post',
-		onSuccess: function() {},
-		onFailure: function(text, xhr, e)
-		{
-			alert('Error occured while loading data: ' + text + ' [' + (e && e.message) + ']');
-		},
-		onComplete: function() {},
+		// Default the callbacks to empty functions
+		onSuccess: Util.emptyFn,
+		onFailure: Util.emptyFn,
+		onComplete: Util.emptyFn,
 		format: 'json',
 		data: null,
-		// What "this" should be when callback is called
 		context: null,
-		abortPrev: false
 	}, options);
 }
 
@@ -68,7 +71,7 @@ Ajax.prototype =
 			// readyState 4 == complete
 			if (xhr.readyState == 4)
 			{
-				self.onComplete(xhr, requestId);
+				self._onComplete(xhr, requestId);
 			}
 		}
 		xhr.send(Util.buildQueryString(data || this.options.data));
@@ -79,7 +82,7 @@ Ajax.prototype =
 	 * @param	XMLHttpRequest		XHR object used to send request
 	 * @param	int					Request ID
 	 */
-	onComplete: function(xhr, requestId)
+	_onComplete: function(xhr, requestId)
 	{
 		var callback = xhr.status == 200 ? this.options.onSuccess : this.options.onFailure;
 		
@@ -111,7 +114,7 @@ Ajax.prototype =
 	 * Internal function, get an XMLHttpRequest object
 	 * @return XMLHttpRequest object
 	 */
-	getXHR: (function()
+	_getXHR: (function()
 	{
 		// W3C
 		if (window.XMLHttpRequest)
