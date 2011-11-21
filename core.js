@@ -27,20 +27,6 @@ var Util =
 	},
 	
 	/**
-	 * Clone an object and return the newly created clone.
-	 * @param	Object to clone
-	 * @return The clone
-	 */
-	clone: function(obj)
-	{
-		// Create a temporary constructor so the object's constructor isn't called while cloning
-		function F() { };
-		F.prototype = obj;
-		
-		return new F();
-	},
-	
-	/**
 	 * URL encode some data, for POSTing or use in a GET querystring. Supports a single level of 
 	 * arrays or objects in the data hash. These will be formatted as a PHP array.
 	 * @param	Hash of data
@@ -144,5 +130,16 @@ if (!String.prototype.trim)
 	String.prototype.trim = function ()
 	{
 		return this.replace(/^\s+|\s+$/g,'');
+	};
+}
+
+// Based off https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/create
+if (!Object.create)
+{
+	Object.create = function (o)
+	{
+		function F() {}
+		F.prototype = o;
+		return new F();
 	};
 }

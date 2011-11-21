@@ -498,6 +498,9 @@ ElementWrapper.prototype =
 	
 	removeChild: function(node)
 	{
+		if (node instanceof ElementWrapper)
+			node = node.element;
+		
 		this.element.removeChild(node);
 		return this;
 	}
