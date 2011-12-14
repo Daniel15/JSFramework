@@ -3,11 +3,37 @@ module('Core');
 test('environment', function()
 {
 	// Check required functions
-	ok(Function.prototype.bind, 'Function.prototype.bind');
 	ok(String.prototype.trim, 'String.prototype.trim');
 });
 
+test('Function.bind', function()
+{
+	var thisObj = { Daniel15: 'is awesome'};
+	var fn = function() 
+	{
+		// Ensure "this" is correct
+		deepEqual(this, thisObj);
+	}
+	fn.bind(thisObj)();
+});
+
 module('Core: Util');
+
+test('extend: returns extended object', function()
+{
+	var extended = Util.extend({hello: 'world'}, {foo: 'bar'});
+	var expected = {hello: 'world', foo: 'bar'};
+	deepEqual(extended, expected);
+});
+
+test('extend: modifies destination object', function()
+{
+	var first = {hello: 'world'};
+	var second = {foo: 'bar'};
+	Util.extend(first, second);
+	// Ensure elements from second object are in first object
+	equals(first.foo, 'bar');
+});
 
 test('buildQueryString simple', function()
 {
