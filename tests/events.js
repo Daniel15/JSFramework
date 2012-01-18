@@ -1,7 +1,9 @@
-module('Events');
-
-test('functions', function()
+describe('Events', function()
 {
-	ok(Events.add, 'add');
-	ok(Events.stop, 'stop');
+	it('should set up the environment', function()
+	{
+		expect(Events.add).toBeDefined();
+		expect(Events.stop).toBeDefined();
+		expect(ElementWrapper.prototype.addEvent).toBeDefined();
+	});
 });
