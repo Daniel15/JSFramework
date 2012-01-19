@@ -36,7 +36,7 @@
 		for (var name in proto)
 		{
 			if (!proto.hasOwnProperty(name))
-				return;
+				continue;
 				
 			// Does this function already exist on the parent class?
 			if (extendThis.prototype[name])
