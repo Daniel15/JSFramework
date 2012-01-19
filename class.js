@@ -12,38 +12,28 @@
 	 * @param	Class		Class to extend, if any
 	 * @return	Class instance
 	 */
-	var Class = window.Class = function(proto, extendThis)
+	var Class = window.Class = function(proto)
 	{
 		// Create the class constructor
-		//var NewClass = proto.init ? proto.init : function() {};
 		function NewClass()
 		{				
 			if (this.init)
 				this.init.apply(this, arguments);
 		}
+		// Add some helpful functions
 		NewClass.extend = Class.extend;
 		
 		// If not extending, easy - Just assign the prototype directly
-		if (!extendThis)
+		if (!proto.Extends)
 		{
 			NewClass.prototype = proto;
-			return NewClass;
 		}
-		// First create the new class with a copy of the original prototype
-		NewClass.prototype = Object.create(extendThis.prototype);
-		
-		// Add all the new methods to the prototype
-		for (var name in proto)
+		else
 		{
-			if (!proto.hasOwnProperty(name))
-				continue;
-				
-			// Does this function already exist on the parent class?
-			if (extendThis.prototype[name])
-				NewClass.prototype[name] = Class.wrapFn(extendThis.prototype[name], proto[name]);
-			else
-				// No parent method with the same name, so we can just copy it directly
-				NewClass.prototype[name] = proto[name];
+			// Create the new class with a copy of the original prototype
+			NewClass.prototype = Object.create(proto.Extends.prototype);
+			// Add all new functions onto the new class
+			Class.mixin(proto, NewClass);
 		}
 		
 		return NewClass;
@@ -59,7 +49,8 @@
 		 */
 		extend: function(proto)
 		{
-			return new Class(proto, this);
+			proto.Extends = this;
+			return new Class(proto);
 		},
 		/**
 		 * Create a wrapper for this function. This wrapper saves the parent function into .parent 
@@ -82,6 +73,28 @@
 				this.parent = tmp;
 				return ret;
 			};
+		},
+		/**
+		 * Copy functions from the source to the destination prototype. If functions already exist 
+		 * on the destination, a wrapper will be created that saves the old method into the .parent()
+		 * method at runtime.
+		 * @param	Object		Source - Object containing functions to add
+		 * @param	Object		Destination - Object whose prototype will receive the new functions
+		 */
+		mixin: function(source, destination)
+		{
+			for (var name in source)
+			{
+				if (!source.hasOwnProperty(name))
+					continue;
+				
+				// Does this function already exist on the parent class?
+				if (destination.prototype[name] && typeof(destination.prototype[name]) == 'function')
+					destination.prototype[name] = Class.wrapFn(destination.prototype[name], source[name]);
+				else
+					// No parent method with the same name, so we can just copy it directly
+					destination.prototype[name] = source[name];
+			}
 		}
 	});
 })();
