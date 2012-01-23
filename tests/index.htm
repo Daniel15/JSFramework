@@ -1,26 +1,45 @@
-<!DOCTYPE html>  
-<html>  
-<head>  
-	<title>QUnit Test Suite</title>  
-	<link rel="stylesheet" href="qunit/qunit.css" />  
-</head>  
-<body>  
-    <h1 id="qunit-header">JSFramework Unit Tests</h1>  
-    <h2 id="qunit-banner"></h2>  
-    <div id="qunit-testrunner-toolbar"></div>  
-    <h2 id="qunit-userAgent"></h2>  
-    <ol id="qunit-tests"></ol>  
-	<div id="qunit-fixture"></div>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Jasmine Spec Runner</title>
+
+	<link rel="shortcut icon" type="image/png" href="jasmine/jasmine_favicon.png" />
+	<link rel="stylesheet" href="jasmine/jasmine.css" />
+</head>
+
+<body>
+	<div id="fixtures"></div>
 	
-	<script src="qunit/qunit.js"></script>  
+	<!-- Jasmine core -->
+	<script src="jasmine/jasmine.js"></script>
+	<script src="jasmine/jasmine-html.js"></script>
 	
 	<!-- Scripts being tested -->
 	<script src="../core.js"></script>
 	<script src="../dom.js"></script>
 	<script src="../events.js"></script>
+	<script src="../class.js"></script>
 	<!-- Tests -->
 	<script src="core.js"></script>
 	<script src="dom.js"></script>
 	<script src="events.js"></script>
+	<script src="class.js"></script>
+
+	<!-- Let's get this party started -->
+	<script>
+	(function() {
+		var jasmineEnv = jasmine.getEnv();
+		jasmineEnv.updateInterval = 1000;
+		
+		var reporter = new jasmine.TrivialReporter();
+		jasmineEnv.addReporter(reporter);
+
+		jasmineEnv.specFilter = function(spec) {
+			return reporter.specFilter(spec);
+		};
+
+		jasmineEnv.execute();
+	})();
+	</script>
 </body>
 </html>

@@ -1,126 +1,157 @@
-module('DOM');
-test('parent(body)', function()
-{
-	equals($('qunit-fixture').parent('body'), DOM.body);
-});
+// TODO: Proper fixture support (similar to Jasmine-Prototype)
 
-test('previous', function()
+describe('DOM', function()
 {
-	equals($('qunit-fixture').previous(), $('qunit-tests'));
-});
-
-test('next', function()
-{
-	equals($('qunit-tests').next(), $('qunit-fixture'));
-});
-
-module('DOM: Class names', 
-{
-	setup: function()
+	describe('Navigation', function()
 	{
-		this.el = $('qunit-fixture');
-		this.el.set('className', 'hello world foobar');
-	}
-});
-
-test('addClass', function()
-{
-	this.el.addClass('test');
-	equals(this.el.get('className'), 'hello world foobar test');
-	this.el.addClass('test2');
-	equals(this.el.get('className'), 'hello world foobar test test2');
-});
-
-test('removeClass', function()
-{
-	this.el.set('className', 'hello world foobar test');
+		beforeEach(function()
+		{
+			$('fixtures').set('innerHTML', '<div id="fixture-first"></div><div id="fixture-second"></div><div id="fixture-third"></div>')
+		});
+		it('should support .parent("body")', function()
+		{
+			expect($('fixtures').parent('body')).toBe(DOM.body);
+		});
+		it('should support .previous()', function()
+		{
+			expect($('fixture-second').previous().get('id')).toBe('fixture-first');
+		});
+		it('should support .next()', function()
+		{
+			expect($('fixture-second').next().get('id')).toBe('fixture-third');
+		});
+	});
 	
-	this.el.removeClass('world');
-	equals(this.el.get('className'), 'hello foobar test', 'remove from middle');
-	
-	this.el.removeClass('test');
-	equals(this.el.get('className'), 'hello foobar', 'remove from end');
-	
-	this.el.removeClass('hello');
-	equals(this.el.get('className'), 'foobar', 'remove from start');
-});
-
-test('hasClass', function()
-{
-	ok(this.el.hasClass('hello'), 'start');
-	ok(this.el.hasClass('world'), 'middle');
-	ok(this.el.hasClass('foobar'), 'end');
-	ok(!this.el.hasClass('asdf'), 'invalid class');
-	ok(!this.el.hasClass(''), 'empty class');
-});
-
-module('DOM: Creation');
-
-test('simple', function()
-{
-	var el = DOM.create('div');
-	equal(el.get('nodeName'), 'DIV', 'node name');
-});
-
-test('with properties', function()
-{
-	var el = DOM.create('div', { id: 'newDiv', innerHTML: 'Hello world' });
-	equal(el.get('id'), 'newDiv', 'id');
-	equal(el.get('innerHTML'), 'Hello world', 'innerHTML');
-});
-
-test('with attributes', function()
-{
-	var el = DOM.create('div', {}, true, { 'data-awesome': 'yes' });
-	equal(el.getAttribute('data-awesome'), 'yes');
-});
-
-module('DOM: Wrapping');
-
-test('Elements aren\'t wrapped twice', function()
-{
-	var el = DOM.create('div');
-	var wrapped = $(el);
-	equal(el, wrapped);
-});
-
-test('Wrappers are cached', function()
-{
-	var el1 = $('qunit-fixture');
-	var el2 = $('qunit-fixture');
-	equal(el1, el2);
-});
-
-test('wrapAll: Ensure all are wrapped', function()
-{
-	var els = document.getElementsByTagName('div');
-	var wrapped = DOM.wrapAll(els);
-	for (var i = 0, count = wrapped.length; i < count; i++)
+	describe('Class names', function()
 	{
-		ok(wrapped[i] instanceof ElementWrapper, 'item ' + i);
-	}
-});
+		var el;
+		beforeEach(function()
+		{
+			el = $('fixtures');
+			el.set('className', 'hello world foobar');
+		});
+		it('should support addding classes', function()
+		{
+			el.addClass('test');
+			expect(el.get('className')).toBe('hello world foobar test');
+			el.addClass('test2');
+			expect(el.get('className')).toBe('hello world foobar test test2');
+		});
+		describe('removeClass', function()
+		{
+			it('should support removing from the middle', function()
+			{
+				el.removeClass('world');
+				expect(el.get('className')).toBe('hello foobar');
+			});
+			it('should support removing from the end', function()
+			{
+				el.removeClass('foobar');
+				expect(el.get('className')).toBe('hello world');
+			});
+			it('should support removing from the start', function()
+			{
+				el.removeClass('hello');
+				expect(el.get('className')).toBe('world foobar');
+			});
+		});
+		describe('hasClass', function()
+		{
+			it('should support checking the start', function()
+			{
+				expect(el.hasClass('hello')).toBeTruthy();
+			});
+			it('should support checking the middle', function()
+			{
+				expect(el.hasClass('world')).toBeTruthy();
+			});
+			it('should support checking the end', function()
+			{
+				expect(el.hasClass('foobar')).toBeTruthy();
+			});
+			it('should return false for invalid classes', function()
+			{
+				expect(el.hasClass('asdf')).toBeFalsy();
+			});
+			it('should return false for empty classes', function()
+			{
+				expect(el.hasClass('')).toBeFalsy();
+			});
+		});
+	});
+	
+	describe('Creation', function()
+	{
+		it('should support simple DOM creation', function()
+		{
+			var el = DOM.create('div');
+			expect(el.get('nodeName')).toBe('DIV');
+		});
+		it('should support properties', function()
+		{
+			var el = DOM.create('div', { id: 'newDiv', innerHTML: 'Hello world' });
+			expect(el.get('id')).toBe('newDiv');
+			expect(el.get('innerHTML')).toBe('Hello world');
+		});
 
-test('wrapAll: Ensure method is called on all', function()
-{
-	// Arrange
-	// Create 5 new elements and add them to the body
-	for (var i = 0; i < 5; i++)
+		it('should support attributes', function()
+		{
+			var el = DOM.create('div', {}, true, { 'data-awesome': 'yes' });
+			expect(el.getAttribute('data-awesome')).toBe('yes');
+		});
+	});
+	
+	describe('Wrapping', function()
 	{
-		var el = DOM.create('div', { className: 'wrapAllTester' });
-		DOM.body.appendChild(el);
-	}
+		it('should not wrap elements twice', function()
+		{
+			var el = DOM.create('div');
+			var wrapped = $(el);
+			expect(el).toBe(wrapped);
+		});
+		
+		it('should cache wrappers', function()
+		{
+			var el1 = $('fixtures');
+			var el2 = $('fixtures');
+			expect(el1).toBe(el2);
+		});
+		
+		describe('wrapAll', function()
+		{
+			it('should wrap all passed elements', function()
+			{
+				var els = document.getElementsByTagName('div');
+				var wrapped = DOM.wrapAll(els);
+				for (var i = 0, count = wrapped.length; i < count; i++)
+				{
+					expect(wrapped[i] instanceof ElementWrapper).toBeTruthy();
+				}
+			});
+			
+			it('should call methods on all elements', function()
+			{
+				// Arrange
+				// Create 5 new elements and add them to the body
+				for (var i = 0; i < 5; i++)
+				{
+					var el = DOM.create('div', { className: 'wrapAllTester' });
+					DOM.body.appendChild(el);
+				}
 	
-	// Act
-	var els = DOM.body.getByClass('wrapAllTester');
-	els.addClass('testpassed');
+				// Act
+				var els = DOM.body.getByClass('wrapAllTester');
+				els.addClass('testpassed');
 	
-	// Assert
-	for (var i = 0; i < 5; i++)
-	{
-		equal(els[i].get('className'), 'wrapAllTester testpassed');
-	}
+				// Assert
+				for (var i = 0; i < 5; i++)
+				{
+					expect(els[i].get('className')).toBe('wrapAllTester testpassed');
+				}
 	
-	// Remove the elements
-	els.remove();
+				// Remove the elements
+				els.remove();
+			});
+		});
+	});
 });
