@@ -32,16 +32,29 @@ var Events = (function()
 		eventHandling = {
 			add: function(obj, type, fn)
 			{
-				obj['e'+type+fn] = fn;
-				obj[type+fn] = function()
+				/**
+				 * Normalize the event - Convert IE-specific properties into W3C properties.
+				 * @param	Event	The event
+				 */
+				function normalizeEvent(e)
 				{
-					var e = window.event;
 					// target - What actually triggered the event
 					e.target = e.srcElement;
 					// currentTarget - Where the event has bubbled up to (always the object the
 					// handler is attached to)
 					// Reference: https://developer.mozilla.org/en/DOM/event.currentTarget
 					e.currentTarget = obj;
+					// Mouse location
+					// Reference: http://www.quirksmode.org/js/events_properties.html
+					e.pageX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+					e.pageY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+					return e;
+				}
+			
+				obj['e'+type+fn] = fn;
+				obj[type+fn] = function()
+				{
+					var e = normalizeEvent(window.event);
 					obj['e'+type+fn](e);
 				}
 				obj.attachEvent('on'+type, obj[type+fn]);
