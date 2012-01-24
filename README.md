@@ -2,17 +2,18 @@ Simple JavaScript Framework
 ===========================
 
 Simple JavaScript framework I use when I don't need a heavyweight framework like MooTools. Currently 
-contains a very limited feature set (mostly AJAX) which won't be growing much.
+contains a very limited feature set (mostly AJAX) which won't be growing much. In general, I aim to
+support IE 6 and above, as well as the latest versions of Opera, Firefox and Chrome.
 
-This documentation is most likely out of date, please refer to the code for the latest features. The
-documentation will be updated when I get a chance to.
+This documentation is most likely out of date, please refer to the code and unit tests for the 
+latest features. The documentation will be updated when I get a chance to.
 
 Features
 ========
  - AJAX
    - Both GET and POST
  - Cross-browser event handling
-   - Normalisation of events in IE (target and currentTarget properties)
+   - Normalisation of events in IE (target, currentTarget, pageX and pageY properties)
    - Onload handler that automatically calls functions based on body ID
    - Event delegation
  - DOM functions and DOM object wrapping
@@ -24,7 +25,7 @@ Features
    - HTML5 window.localStorage polyfill
    - Function.prototype.bind, String.prototype.trim
    - JSON.parse
-   
+ - Simple "class" (prototypal inheritance) implementation
 
 Examples
 ========
@@ -99,6 +100,56 @@ DOM
 	// Appending HTML
 	newEl.append('Some more HTML here');
 	
+Classes
+-------
+Creation:
+
+	var Person = new Class(
+	{
+		init: function(name)
+		{
+			this.name = name;
+		},
+		helloWorld: function()
+		{
+			return 'Hello';
+		},
+		helloWorld2: function()
+		{
+			return 'Hello2';
+		}
+	});
+	
+Instantiation:
+
+	var me = new Person('Daniel');
+	console.log('me.name = ', me.name); // Daniel
+	console.log('me.helloWorld() = ', me.helloWorld()); // Hello
+	console.log('me.helloWorld2() = ', me.helloWorld2()); // Hello2
+	console.log('me instanceof Person = ', me instanceof Person); // true
+	
+Inheritance:
+
+	var Ninja = Person.extend(
+	{
+		helloWorld2: function()
+		{
+			return 'Ninja helloWorld2, original = ' + this.parent();
+		},
+		helloWorld3: function()
+		{
+			return 'Ninja helloWorld3';
+		}
+	});
+	
+	var awesome2 = new Ninja('Awesome');
+	console.log('awesome2.name = ', awesome2.name); // Awesome
+	console.log('awesome2.helloWorld() = ', awesome2.helloWorld()); // Hello
+	console.log('awesome2.helloWorld2() = ', awesome2.helloWorld2()); // Ninja helloWorld2, original = Hello2
+	console.log('awesome2.helloWorld3() = ', awesome2.helloWorld3()); // Ninja helloWorld3
+	console.log('awesome2 instanceof Ninja = ', awesome2 instanceof Ninja); // true
+	console.log('awesome2 instanceof Person = ', awesome2 instanceof Person); // true
+	
 General utilities
 -----------------
 
@@ -123,7 +174,31 @@ General utilities
 	Browser.ie // Contains IE version, or 'undefined' if not using IE
 	
 
+Tests
+=====
+Jasmine is being used for unit tests. They are all located in the "tests" directory - Open 
+"index.htm" in your browser to run them.
+
 Licence
 =======
-Please feel free to use any bits of this code in your own work, but if you do, link to my site
-(dan.cx)
+(The MIT licence)
+
+Copyright (C) 2011-2012 Daniel Lo Nigro (Daniel15)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
