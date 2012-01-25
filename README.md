@@ -32,147 +32,163 @@ Examples
 
 AJAX - GET
 ----------
-	var request = new Ajax('test.php',
+```javascript
+var request = new Ajax('test.php',
+{
+	onSuccess: function(data)
 	{
-		onSuccess: function(data)
-		{
-			console.log(data);
-		}
-	});
-	request.send();
-
+		console.log(data);
+	}
+});
+request.send();
+```
 
 AJAX - POST
 -----------
 Uses Util.buildQueryString to encode POST data. Arrays and hashes are sent using PHP syntax
 
-	(new Ajax('test.php',
+```javascript
+(new Ajax('test.php',
+{
+	data:
 	{
-		data:
+		'hello': 'world',
+		// Supports arrays
+		'arrayTest': [1, 2, 3, 4, 5],
+		// Supports hashes
+		'hashText': 
 		{
-			'hello': 'world',
-			// Supports arrays
-			'arrayTest': [1, 2, 3, 4, 5],
-			// Supports hashes
-			'hashText': 
-			{
-				'awesome': true,
-				'something': 'else'
-			}
-		},
-		onSuccess: function(data)
-		{
-			console.log(data);
+			'awesome': true,
+			'something': 'else'
 		}
-	})).send();
+	},
+	onSuccess: function(data)
+	{
+		console.log(data);
+	}
+})).send();
+```
 	
 Alternatively, the data can be passed to the send() method directly:
 
-	(new Ajax('test.php',
+```javascript
+(new Ajax('test.php',
+{
+	onSuccess: function(data)
 	{
-		onSuccess: function(data)
-		{
-			console.log(data);
-		}
-	})).send({hello: 'world'});
+		console.log(data);
+	}
+})).send({hello: 'world'});
+```
 
 DOM
 ---
+```javascript
+// Obtaining existing elements
+var container = $('container'); // or DOM.get('container')
+	
+// Element creation
+var newEl = DOM.create('div',
+{
+	id: 'hello-world',
+	className: 'awesome',
+	innerHTML: 'This is a test!'
+});
+	
+// Element insertion
+container.appendChild(newEl); // Insert inside container
+container.insertAfter(newEl); // Insert *after* container
 
-	// Obtaining existing elements
-	var container = $('container'); // or DOM.get('container')
-	
-	// Element creation
-	var newEl = DOM.create('div',
-	{
-		id: 'hello-world',
-		className: 'awesome',
-		innerHTML: 'This is a test!'
-	});
-	
-	// Element insertion
-	container.appendChild(newEl); // Insert inside container
-	container.insertAfter(newEl); // Insert *after* container
-	
-	// Event handling
-	newEl.addEvent('click', function() { alert('Clicked!'); });
-	
-	// Appending HTML
-	newEl.append('Some more HTML here');
+// Event handling
+newEl.addEvent('click', function() { alert('Clicked!'); });
+
+// Event handling using delegates
+DOM.body.addEvent('click', 'a', 'hello', function() { alert('A link with class "hello" was clicked' });
+
+// Appending HTML
+newEl.append('Some more HTML here');
+```
 	
 Classes
 -------
 Creation:
 
-	var Person = new Class(
+```javascript
+var Person = new Class(
+{
+	init: function(name)
 	{
-		init: function(name)
-		{
-			this.name = name;
-		},
-		helloWorld: function()
-		{
-			return 'Hello';
-		},
-		helloWorld2: function()
-		{
-			return 'Hello2';
-		}
-	});
+		this.name = name;
+	},
+	helloWorld: function()
+	{
+		return 'Hello';
+	},
+	helloWorld2: function()
+	{
+		return 'Hello2';
+	}
+});
+```
 	
 Instantiation:
 
-	var me = new Person('Daniel');
-	console.log('me.name = ', me.name); // Daniel
-	console.log('me.helloWorld() = ', me.helloWorld()); // Hello
-	console.log('me.helloWorld2() = ', me.helloWorld2()); // Hello2
-	console.log('me instanceof Person = ', me instanceof Person); // true
+```javascript
+var me = new Person('Daniel');
+console.log('me.name = ', me.name); // Daniel
+console.log('me.helloWorld() = ', me.helloWorld()); // Hello
+console.log('me.helloWorld2() = ', me.helloWorld2()); // Hello2
+console.log('me instanceof Person = ', me instanceof Person); // true
+```
 	
 Inheritance:
 
-	var Ninja = Person.extend(
+```javascript
+var Ninja = Person.extend(
+{
+	helloWorld2: function()
 	{
-		helloWorld2: function()
-		{
-			return 'Ninja helloWorld2, original = ' + this.parent();
-		},
-		helloWorld3: function()
-		{
-			return 'Ninja helloWorld3';
-		}
-	});
+		return 'Ninja helloWorld2, original = ' + this.parent();
+	},
+	helloWorld3: function()
+	{
+		return 'Ninja helloWorld3';
+	}
+});
 	
-	var awesome2 = new Ninja('Awesome');
-	console.log('awesome2.name = ', awesome2.name); // Awesome
-	console.log('awesome2.helloWorld() = ', awesome2.helloWorld()); // Hello
-	console.log('awesome2.helloWorld2() = ', awesome2.helloWorld2()); // Ninja helloWorld2, original = Hello2
-	console.log('awesome2.helloWorld3() = ', awesome2.helloWorld3()); // Ninja helloWorld3
-	console.log('awesome2 instanceof Ninja = ', awesome2 instanceof Ninja); // true
-	console.log('awesome2 instanceof Person = ', awesome2 instanceof Person); // true
+var awesome2 = new Ninja('Awesome');
+console.log('awesome2.name = ', awesome2.name); // Awesome
+console.log('awesome2.helloWorld() = ', awesome2.helloWorld()); // Hello
+console.log('awesome2.helloWorld2() = ', awesome2.helloWorld2()); // Ninja helloWorld2, original = Hello2
+console.log('awesome2.helloWorld3() = ', awesome2.helloWorld3()); // Ninja helloWorld3
+console.log('awesome2 instanceof Ninja = ', awesome2 instanceof Ninja); // true
+console.log('awesome2 instanceof Person = ', awesome2 instanceof Person); // true
+```
 	
 General utilities
 -----------------
 
-	// Building query strings
-	var stuff = 
+```javascript
+// Building query strings
+var stuff = 
+{
+	hello: 'world',
+	foo: 'bar',
+	arrayTest: [1, 2, 3],
+	objectTest: 
 	{
-		hello: 'world',
-		foo: 'bar',
-		arrayTest: [1, 2, 3],
-		objectTest: 
-		{
-			one: 'two',
-			three: 'four'
-		}
-	};
-	
-	Util.buildQueryString(stuff) // returns hello=world&foo=bar&arrayTest[]=1&arrayTest[]=2&
-	                             // objectTest[one]=two&objectTest[three]=four
-	
-	
-	// IE detection
-	Browser.ie // Contains IE version, or 'undefined' if not using IE
-	
+		one: 'two',
+		three: 'four'
+	}
+};
+
+Util.buildQueryString(stuff) // returns hello=world&foo=bar&arrayTest[]=1&arrayTest[]=2&
+                             // objectTest[one]=two&objectTest[three]=four
+
+
+// IE detection
+Browser.ie // Contains IE version, or 'undefined' if not using IE
+```	
 
 Tests
 =====
