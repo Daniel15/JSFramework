@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Event Test</title>
+</head>
+<body>
+	<div id="container">
+		<input type="button" value="Button 1" id="button1" />
+		<input type="button" value="Button 2" id="button2" class="button2" />
+		<input type="button" value="Button 3" id="button3" />
+	
+		<div id="output"></div>
+	</div>
+	
+	<script src="../../core.js"></script>
+	<script src="../../dom.js"></script>
+	<script src="../../events.js"></script>
+	<script>
+	(function()
+	{
+		var output = $('output');
+		
+		// Regular event
+		$('button1').addEvent('click', function(e)
+		{
+			output.append('Button 1 clicked - this is element? ' + (this == $('button1').element) + ', target = ' + e.target.id + '<br />');
+		});
+		
+		// Delegate
+		$('container').addDelegate('click', 'input', 'button2', function(e)
+		{
+			output.append('Button 2 (delegate) clicked - this = ' + this + ', target = ' + e.target.id + '<br />');
+		});
+
+		// "this" bound
+		var button3Data = { success: true };		
+		$('button3').addEvent('click', (function(e)
+		{
+			output.append('Button 3 clicked - success = ' + this.success + '<br />');
+		}).bind(button3Data));
+		
+		window.addEvent('load', function()
+		{
+			output.append('Page loaded<br />');
+		});
+	})();
+	</script>
+</body>

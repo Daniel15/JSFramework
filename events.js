@@ -27,8 +27,6 @@ var Events = (function()
 	// Internet Explorer
 	else
 	{
-		// Based off http://www.quirksmode.org/blog/archives/2005/10/_and_the_winner_1.html
-		// Modified to set target using srcElement
 		eventHandling = {
 			add: function(obj, type, fn)
 			{
@@ -50,14 +48,12 @@ var Events = (function()
 					e.pageY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 					return e;
 				}
-			
-				obj['e'+type+fn] = fn;
-				obj[type+fn] = function()
+				
+				// TODO: This can't be an anonymous function if we ever want to remove the handler
+				obj.attachEvent('on' + type, function()
 				{
-					var e = normalizeEvent(window.event);
-					obj['e'+type+fn](e);
-				}
-				obj.attachEvent('on'+type, obj[type+fn]);
+					fn.call(obj, normalizeEvent(window.event));
+				});
 			},
 			stop: function(e)
 			{
@@ -210,3 +206,14 @@ Util.extend(ElementWrapper.prototype,
 		return this;
 	}
 });
+
+// Extend the window
+/**
+ * Add an event handler to the window
+ * @param	Type of event handler (eg. "click")
+ * @param	Function for handling these events
+ */
+window.addEvent = function(type, fn)
+{
+	Events.add(window, type, fn);
+}
