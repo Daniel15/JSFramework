@@ -1,0 +1,10 @@
+{
+	"name": "Daniel15 JSFramework",
+	"description": "A simple JavaScript framework",
+	"url": "http://dl.vc/jsframework",
+	"options": {
+		"linkNatives": true,
+		"exclude": "tests",
+		"outdir": "./docs"
+	}
+}

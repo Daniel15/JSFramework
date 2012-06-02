@@ -1,4 +1,4 @@
-/**
+/*
  * Daniel15 JavaScript Framework - By Daniel15, 2011
  * http://dl.vc/jsframework
  * Feel free to use any of this, but please link back to my site (dan.cx)
