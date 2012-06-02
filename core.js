@@ -6,6 +6,10 @@
  
 /**
  * General utilities
+ * @module JSFramework
+ * @submodule Core
+ * @class Util
+ * @static
  */
 var Util = 
 {
@@ -13,8 +17,15 @@ var Util =
 	
 	/**
 	 * Add all elements from source to destination and return the modified destination (for chaining)
-	 * @param	Object to copy properties to
-	 * @param	Object to copy properties from
+	 * @method  extend
+	 * @param	destination {Object} Object to copy properties to
+	 * @param	source      {Object} Object to copy properties from
+	 * @return  {Object}    An object with all the combined properties
+	 * @example
+	var first = { hello: 'world' };
+	var second = { foo: 'bar' };
+	var result = Util.extend(first, second);
+	// first and result now both contain { hello: 'world', foo: 'bar'}
 	 */
 	extend: function(destination, source)
 	{
@@ -29,7 +40,23 @@ var Util =
 	/**
 	 * URL encode some data, for POSTing or use in a GET querystring. Supports a single level of 
 	 * arrays or objects in the data hash. These will be formatted as a PHP array.
-	 * @param	Hash of data
+	 * @method  buildQueryString
+	 * @param	Hash {Object} Hash of data
+	 * @return  {String} URL encoded querystring
+	 * @example
+	var stuff = 
+	{
+		hello: 'world',
+		foo: 'bar',
+		arrayTest: [1, 2, 3],
+		objectTest: 
+		{
+			one: 'two',
+			three: 'four'
+		}
+	};
+
+	Util.buildQueryString(stuff) // returns hello=world&foo=bar&arrayTest[]=1&arrayTest[]=2&objectTest[one]=two&objectTest[three]=four
 	 */
 	buildQueryString: function(data)
 	{
@@ -70,12 +97,19 @@ var Util =
 
 /**
  * Browser-specific stuff. Mainly IE hacks
+ * @class Browser
+ * @module JSFramework
+ * @submodule Core
+ * @static
  */
 var Browser =
 {
 	/**
 	 * The IE version in use, or 'undefined' if using a non-IE browser
 	 * Based off http://james.padolsey.com/javascript/detect-ie-in-js-using-conditional-comments/
+	 * @property ie
+	 * @final
+	 * @type Integer|undefined
 	 */
 	ie: (function()
 	{
@@ -93,9 +127,20 @@ var Browser =
 	}())
 };
 
-// Function extensions
+/**
+ * Function extensions - Extensions to JavaScript's native Function.prototype
+ * @class Function
+ */
 Util.extend(Function.prototype, 
 {
+	/**
+	 * Run this function after a certain delay
+	 * @method delay
+	 * @param delay {Double} Milliseconds to delay execution
+	 * @example
+	var helloWorld = function() { alert('Hello world!'); }
+	helloWorld.delay(1000); // helloWorld will run after 1000 milliseconds
+	 */
 	delay: function(delay)
 	{
 		return setTimeout(this, delay);

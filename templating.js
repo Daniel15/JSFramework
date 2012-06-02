@@ -4,21 +4,31 @@
  * Feel free to use any of this, but please link back to my site (dan.cx)
  */
 
-// Based off Simple JavaScript Templating by John Resig
-// http://ejohn.org/blog/javascript-micro-templating/
+/**
+ * Templating - Based off [Simple JavaScript Templating](http://ejohn.org/blog/javascript-micro-templating/)
+ *  by John Resig
+ * @module JSFramework
+ * @submodule Core
+ * @class Template
+ * @static
+ */
 var Template = 
 {
 	/**
 	 * Cache of all parsed templates
+	 * @property cache
+	 * @type Object
+	 * @private
 	 */
 	cache: {},
 	
 	/**
 	 * Get a template
-	 * @param	Name of the template
-	 * @param	(optional) Data to use in the template.
-	 * @return	If data is specified, call template with data and return its HTML. If data is not
-	 *          specified, return the template itself.
+	 * @method get
+	 * @param {String} name      Name of the template
+	 * @param {Object} [data={}] Data to use in the template.
+	 * @return	{Function} If data is specified, call template with data and return its HTML. If data 
+	 * is not specified, return the template itself.
 	 */
 	get: function(name, data)
 	{
@@ -33,9 +43,10 @@ var Template =
 	/**
 	 * Parse a template, returning a JavaScript function to execute it. Also caches the template in
 	 * case it's used later
-	 * @param	Name of the template, used to cache it
-	 * @param	Template code
-	 * @return	JavaScript function for executing the template
+	 * @method parse
+	 * @param	{String} name Name of the template, used to cache it
+	 * @param	{String} tmpl Template code
+	 * @return	{Function} JavaScript function for executing the template
 	 */
 	parse: function(name, tmpl)
 	{

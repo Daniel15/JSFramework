@@ -4,6 +4,13 @@
  * Feel free to use any of this, but please link back to my site (dan.cx)
  */
 
+/**
+ * Normalises DOM event handling across browsers
+ * @class Events
+ * @static
+ * @module JSFramework
+ * @submodule DOM
+ */
 var Events = (function()
 {
 	var eventHandling;
@@ -13,10 +20,25 @@ var Events = (function()
 	if (document.addEventListener)
 	{
 		eventHandling = {
+			/**
+			 * Add an event handler.
+			 * @method add
+			 * @param {HTMLElement} obj  Element to add event handler to
+			 * @param {String}      type Type of event handler (eg. "click")
+			 * @param {Function}    fn   Function that will handle the event
+			 * @example
+	var el = document.getElementById('blah');
+	Events.add(el, 'click', function() { alert('I was clicked!'); });
+			 */
 			add: function(obj, type, fn)
 			{
 				obj.addEventListener(type, fn, false);
 			},
+			/**
+			 * Stop this event from propagating or running the default action
+			 * @method stop
+			 * @param {Event} e The event
+			 */
 			stop: function(e)
 			{
 				e.preventDefault();
@@ -31,8 +53,12 @@ var Events = (function()
 			add: function(obj, type, fn)
 			{
 				/**
-				 * Normalize the event - Convert IE-specific properties into W3C properties.
-				 * @param	Event	The event
+				 * @method normalizeEvent
+				 * Normalize the event - Convert IE-specific properties into W3C properties. Only used
+				 * if the browser is IE
+				 * @param {Event} e The event
+				 * @return {Event} A modified version of the event
+				 * @private
 				 */
 				function normalizeEvent(e)
 				{
@@ -74,6 +100,9 @@ var Events = (function()
 		 * Example: An ID of "site-projects" would call Page.Site.init() and Page.Site.Projects.init().
 		 * site-projects-foo would call Page.Site.init(), Page.Site.Projects.init() and Page.Site.Foo.init().
 		 * "blog" would call Page.Blog.init().
+		 *
+		 * @method initPage
+		 * @param [id=document.body.id] Page ID
 		 */
 		initPage: function(id)
 		{
@@ -110,18 +139,38 @@ var Events = (function()
 	});
 })();
 
+/**
+ * Event delegation - Attach an event handler to a container element to handle events for inner
+ * elements. This has several advantages, including improved performance when a lot of elements are
+ * involved (as less event handlers are attached), and not having to attach event handlers to 
+ * AJAX-loaded content.
+ *
+ * @class EventDelegation
+ * @static
+ * @module JSFramework
+ * @submodule DOM
+ */
 var EventDelegation = 
 {
+	/**
+	 * The current delegates
+	 * @property delegates
+	 * @type Object
+	 * @private
+	 */
 	delegates: {},
+	
 	/**
 	 * Attach a handler to all tagNames with a class of className, by attaching the event 
 	 * listener to containerEl. Works for both current elements, and new elements added in the
 	 * future.
-	 * @param	Element		Container element to add event listener to
-	 * @param	String		Type of event listener (eg. "click")
-	 * @param	String		Tag name to add events to (eg. "a")
-	 * @param	String		Class name to add events to, or null for none
-	 * @param	String		Event handler function
+	 * @method add
+	 * @param	{Element}   containerEl Container element to add event listener to
+	 * @param	{String}    type        Type of event listener (eg. "click")
+	 * @param	{String}    tagName     Tag name to add events to (eg. "a")
+	 * @param	{String}    className   Class name to add events to, or null for none
+	 * @param	{Function}  fn          Event handler function
+	 * @chainable
 	 */
 	add: function(containerEl, type, tagName, className, fn)
 	{
@@ -144,11 +193,14 @@ var EventDelegation =
 		}
 		
 		this.delegates[id][type].push({tagName: tagName.toUpperCase(), className: className, fn: fn});
+		return this;
 	},
 	
 	/**
 	 * Handle a delegated event
-	 * @param	Event data
+	 * @method handle
+	 * @param	{Event} e Event data
+	 * @private
 	 */
 	handle: function(e)
 	{
@@ -156,6 +208,7 @@ var EventDelegation =
 		var containerId = container.getElementId();
 		var target = $(e.target);
 		
+		// Ensure the element actually has delegates for this event type
 		if (!this.delegates[containerId] || !this.delegates[containerId][e.type])
 		{
 			return;
@@ -178,12 +231,17 @@ var EventDelegation =
 };
 
 // Extend the element wrapper prototype
+/**
+ * @class ElementWrapper
+ */
 Util.extend(ElementWrapper.prototype, 
 {
 	/**
 	 * Add an event handler to this element.
-	 * @param	Type of event handler (eg. "click")
-	 * @param	Function for handling these events
+	 * @method addEvent
+	 * @param	{String}   type Type of event handler (eg. "click")
+	 * @param	{Function} fn   Function for handling these events
+	 * @chainable
 	 */
 	addEvent: function(type, fn)
 	{
@@ -195,10 +253,12 @@ Util.extend(ElementWrapper.prototype,
 	 * Add a delegated event handler to this element. Attach a handler to all tagNames with a class
 	 * of className, by attaching the event listener to "this" element. Works for both current 
 	 * elements, and new elements added in the future.
-	 * @param	String		Type of event listener (eg. "click")
-	 * @param	String		Tag name to add events to (eg. "a")
-	 * @param	String		Class name to add events to, or null for none
-	 * @param	String		Event handler function
+	 * @method addDelegate
+	 * @param	{String} type      Type of event listener (eg. "click")
+	 * @param	{String} tagName   Tag name to add events to (eg. "a")
+	 * @param	{String} className Class name to add events to, or null for none
+	 * @param	{String} fn        Event handler function
+	 * @chainable
 	 */
 	addDelegate: function(type, tagName, className, fn)
 	{

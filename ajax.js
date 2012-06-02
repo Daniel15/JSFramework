@@ -5,21 +5,82 @@
  */
  
 /**
- * Create a new AJAX requester. The options available are as follows:
- *  - method: POST or GET
+ * Create a new AJAX requester. 
+ * @class Ajax
+ * @constructor
+ * @module JSFramework
+ * @submodule AJAX
+ * @param  {String} url URL to load
+ * @param  {Object} options Options, which may consist of the following:
+ *
+ *  - method: `POST` or `GET`
  *  - onSuccess, onFailure, onComplete: Callbacks for when the specified event happens
- *  - format: json or text, format to interpret result as
+ *  - format: `json` or `text`, format to interpret result as
  *  - data: GET or POST data to send when doing request
  *  - context: What "this" should be when callback is called
- *
- * @param	String		URL to load
- * @param	Object		Options
- * @todo Document options
+ * @example
+	// Basic GET request:
+	var request = new Ajax('test.php',
+	{
+		onSuccess: function(data)
+		{
+		    console.log(data);
+		}
+	});
+	request.send();
+ * @example
+ 	// POST request
+ 	// Uses Util.buildQueryString to encode POST data. Arrays and hashes are sent using PHP syntax
+	(new Ajax('test.php',
+	{
+		data:
+		{
+		    'hello': 'world',
+		    // Supports arrays
+		    'arrayTest': [1, 2, 3, 4, 5],
+		    // Supports hashes
+		    'hashText': 
+		    {
+		        'awesome': true,
+		        'something': 'else'
+		    }
+		},
+		onSuccess: function(data)
+		{
+		    console.log(data);
+		}
+	})).send();
+	
+	// Alternatively, the data can be passed to the send() method directly:
+	(new Ajax('test.php',
+	{
+		onSuccess: function(data)
+		{
+		    console.log(data);
+		}
+	})).send({hello: 'world'});
  */
 var Ajax = function(url, options)
 {
+	/**
+	 * URL the request will be to
+	 * @property url
+	 * @type String
+	 */
 	this.url = url;
+	/**
+	 * Current request, if any
+	 * @property currentRequest
+	 * @type XMLHttpRequest
+	 * @private
+	 */
 	this.currentRequest = null;
+	
+	/**
+	 * Options for the AJAX request
+	 * @property options
+	 * @type Object
+	 */
 	this.options = Util.extend(
 	{
 		// Default options:
@@ -35,16 +96,29 @@ var Ajax = function(url, options)
 }
 
 // Shared variables
-// Count of how many requests have been done
+/**
+ * Count of how many requests have been done
+ * @property requestCount
+ * @type Integer
+ * @static
+ * @private
+ */
 Ajax.requestCount = 0;
-// All the currently executing requests
+/**
+ * All the currently executing requests
+ * @property requests
+ * @type Object
+ * @static
+ * @private
+ */
 Ajax.requests = {};
 
 Ajax.prototype = 
 {
 	/**
 	 * Send this AJAX request
-	 * @param	Object		Query string data to send, optional.
+	 * @method send
+	 * @param {Object} data	Query string data to send, optional.
 	 */
 	send: function(data)
 	{
@@ -79,8 +153,10 @@ Ajax.prototype =
 	
 	/**
 	 * Internal function, called when request completes
-	 * @param	XMLHttpRequest		XHR object used to send request
-	 * @param	int					Request ID
+	 * @method _onComplete
+	 * @param	{XMLHttpRequest} xhr        XHR object used to send request
+	 * @param	{Integer}        requestId  Request ID
+	 * @private
 	 */
 	_onComplete: function(xhr, requestId)
 	{
@@ -112,7 +188,9 @@ Ajax.prototype =
 	
 	/**
 	 * Internal function, get an XMLHttpRequest object
+	 * @method _getXHR
 	 * @return XMLHttpRequest object
+	 * @private
 	 */
 	_getXHR: (function()
 	{
@@ -160,7 +238,7 @@ if (!window.JSON.parse)
 	window.JSON.parse = function(data)
 	{
 		//\n's in JSON string, when evaluated will create errors in IE
-		var data = data.replace(/[\n\r]/g,"");
+		var data = data.replace(/[\n\r]/g, '');
 		return eval('(' + data + ')');
 	}
 }

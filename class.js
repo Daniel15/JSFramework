@@ -8,15 +8,42 @@
 {
 	/**
 	 * Create a new class instance
-	 * @param	Object		Functions to add to the class
-	 * @param	Class		Class to extend, if any
-	 * @return	Class instance
+	 * @class Class
+	 * @constructor
+	 * @module JSFramework
+	 * @submodule Class
+	 * @param	{Object} Functions to add to the class
+	 * @return	{Class}  Class instance
+	 * @example
+	// Creation
+	var Person = new Class(
+	{
+		init: function(name)
+		{
+			this.name = name;
+		},
+		helloWorld: function()
+		{
+			return 'Hello';
+		},
+		helloWorld2: function()
+		{
+			return 'Hello2';
+		}
+	});
+	
+	// Instantiation
+	var me = new Person('Daniel');
+	console.log('me.name = ', me.name); // Daniel
+	console.log('me.helloWorld() = ', me.helloWorld()); // Hello
+	console.log('me.helloWorld2() = ', me.helloWorld2()); // Hello2
+	console.log('me instanceof Person = ', me instanceof Person); // true
 	 */
 	var Class = window.Class = function(proto)
 	{
 		// Create the class constructor
 		function NewClass()
-		{				
+		{
 			if (this.init)
 				this.init.apply(this, arguments);
 		}
@@ -44,8 +71,47 @@
 	{
 		/**
 		 * Extend the current class. Expected to be called in the context of an existing class.
-		 * @param	Object		Prototype methods of new class
-		 * @return	Class instance
+		 * @method extend
+		 * @param	{Object} proto Prototype methods of new class
+		 * @return	{Class} Class instance
+		 * @example
+	// Base class
+	var Person = new Class(
+	{
+		init: function(name)
+		{
+			this.name = name;
+		},
+		helloWorld: function()
+		{
+			return 'Hello';
+		},
+		helloWorld2: function()
+		{
+			return 'Hello2';
+		}
+	});
+	
+	// Class that inherits from base
+	var Ninja = Person.extend(
+	{
+		helloWorld2: function()
+		{
+		    return 'Ninja helloWorld2, original = ' + this.parent();
+		},
+		helloWorld3: function()
+		{
+		    return 'Ninja helloWorld3';
+		}
+	});
+
+	var awesome2 = new Ninja('Awesome');
+	console.log('awesome2.name = ', awesome2.name); // Awesome
+	console.log('awesome2.helloWorld() = ', awesome2.helloWorld()); // Hello
+	console.log('awesome2.helloWorld2() = ', awesome2.helloWorld2()); // Ninja helloWorld2, original = Hello2
+	console.log('awesome2.helloWorld3() = ', awesome2.helloWorld3()); // Ninja helloWorld3
+	console.log('awesome2 instanceof Ninja = ', awesome2 instanceof Ninja); // true
+	console.log('awesome2 instanceof Person = ', awesome2 instanceof Person); // true
 		 */
 		extend: function(proto)
 		{
@@ -55,9 +121,11 @@
 		/**
 		 * Create a wrapper for this function. This wrapper saves the parent function into .parent 
 		 * (so it can be called from the overriding function) before calling the overriden function.
-		 * @param	Function	Function on the superclass
-		 * @param	Function	Function on the overriding class
-		 * @return	Function
+		 * @method wrapFn
+		 * @param	{Function} superFn Function on the superclass
+		 * @param	{Function} fn      Function on the overriding class
+		 * @return	{Function} Function that saves superFn to .parent, runs fn, then unsets parent
+		 * @private
 		 */
 		wrapFn: function(superFn, fn)
 		{
@@ -78,8 +146,10 @@
 		 * Copy functions from the source to the destination prototype. If functions already exist 
 		 * on the destination, a wrapper will be created that saves the old method into the .parent()
 		 * method at runtime.
-		 * @param	Object		Source - Object containing functions to add
-		 * @param	Object		Destination - Object whose prototype will receive the new functions
+		 * @method mixin
+		 * @param	{Object} source Object containing functions to add
+		 * @param	{Object} destination Object whose prototype will receive the new functions
+		 * @private
 		 */
 		mixin: function(source, destination)
 		{

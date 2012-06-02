@@ -3,20 +3,45 @@
  * http://dl.vc/jsframework
  * Feel free to use any of this, but please link back to my site (dan.cx)
  */
- 
+
+/**
+ * DOM methods
+ * @class DOM
+ * @static
+ * @module JSFramework
+ * @submodule DOM
+ */
 var DOM =
 {
-	/** Cache of ElementWrappers */
+	/**
+	 * Cache of ElementWrappers
+	 * @property cache
+	 * @type Array
+	 * @private
+	 */
 	cache: [],
-	/** Name of the attribute used to store an element ID number in the cache */
+	/**
+	 * Name of the attribute used to store an element ID number in the cache 
+	 * @property JS_ELEMENT_ID
+	 * @final
+	 */
 	JS_ELEMENT_ID: 'js-element-id',
 	
 	/**
 	 * Create and return a new wrapped DOM element
-	 * @param	Tag name to create (eg. "span")
-	 * @param	Properties to set on the new element
-	 * @param	Whether to wrap the element or not. Optional, default is true
-	 * @return The new element (or a wrapper if wrap is true)
+	 * @method create
+	 * @param	{String}  tag                Tag name to create (eg. "span")
+	 * @param	{Object}  [properties={}]    Properties to set on the new element
+	 * @param	{Boolean} [wrap=true]        Whether to wrap the element or not. Optional, default is true
+	 * @param   {Object}  [attributes={}]    Attributes to set on the new element
+	 * @return  {ElementWrapper|HTMLElement} The new element (or a wrapper if wrap is true)
+	 * @example
+	var newEl = DOM.create('div',
+	{
+		id: 'hello-world',
+		className: 'awesome',
+		innerHTML: 'This is a test!'
+	}); // Creates <div id="hello-world" class="awesome">This is a test!</div>
 	 */
 	create: function(tag, properties, wrap, attributes)
 	{
@@ -39,9 +64,14 @@ var DOM =
 	},
 	
 	/**
-	 * Wrap an element with useful functions
-	 * @param	ID of the element
-	 * @return	An ElementWrapper instance
+	 * Wrap an element with useful functions. This creates an instance of {{#crossLink "ElementWrapper"}}{{/crossLink}} 
+	 * that "wraps" the passed element. The `$` method can be used as a shortcut to this.
+	 * @method wrap
+	 * @param	{HTMLElement|ElementWrapper|String} el Either the ID of the element, or the element itself
+	 * @return	{ElementWrapper} An ElementWrapper instance
+	 * @example
+	var containerEl = DOM.wrap('container'); // Gets the element with an ID of "container"
+	var containerEl = $('container');        // Exact same as above - $ is an alias for DOM.wrap
 	 */
 	wrap: function(el)
 	{
@@ -69,20 +99,42 @@ var DOM =
 	
 	/**
 	 * Wrap all the passed elements
-	 * @param	Array of elements
-	 * @return	Array of wrapped elements
+	 * @method wrapAll
+	 * @param	{Array of HTMLElement} input Array of elements
+	 * @return	{Array of ElementWrapper} Array of wrapped elements
+	 * @example
+	// Get all DIVs on the page, and create an ElementWrapper for each
+	var wrapped = DOM.wrapAll(document.getElementsByTagName('div'));
 	 */
 	wrapAll: function(input)
 	{
 		return new ElementWrapperList(input);
-	}
+	},
+	
+	// Set below ElementWrapper, here just to make YUIDoc happy
+	/**
+	 * Body of the page
+	 * @property body
+	 * @type ElementWrapper
+	 */
+	body: null 
 }
 
 /**
- * Class that wraps DOM elements and provides additional functionality
+ * Class that wraps DOM elements and provides additional functionality. Should not be constructed
+ * directly - Instead use {{#crossLink "DOM/wrap"}}{{/crossLink}} or {{#crossLink "DOM/create"}}{{/crossLink}}
+ * @class ElementWrapper
+ * @constructor
+ * @module JSFramework
+ * @submodule DOM
  */
 function ElementWrapper(element)
 {
+	/**
+	 * The element being wrapped
+	 * @property {HTMLElement} element
+	 * @private
+	 */
 	this.element = element;
 }
 
@@ -90,7 +142,8 @@ ElementWrapper.prototype =
 {
 	/**
 	 * Gets the internal element ID for this element. This is *not* the id in the HTML!
-	 * @return The element ID
+	 * @method getElementId
+	 * @return {String} The element ID
 	 */
 	getElementId: function()
 	{
@@ -99,8 +152,13 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Set a property on this element
-	 * @param	Property name
-	 * @param	Value to set
+	 * @method set
+	 * @param {String} key   Property name
+	 * @param {String} value Value to set
+	 * @chainable
+	 * @example
+	var containerEl = $('container');
+	containerEl.set('id', 'foobar'); // Changes ID of #container
 	 */
 	set: function(key, value)
 	{
@@ -110,8 +168,9 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get a property on this element
-	 * @param	Property name
-	 * @return	Property value
+	 * @method get
+	 * @param {String} key Property name
+	 * @return {String} Property value
 	 */
 	get: function(key)
 	{
@@ -120,7 +179,14 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Insert a DOM node after this node
-	 * @param	Wrapped DOM node
+	 * @method insertAfter
+	 * @param  {ElementWrapper} Wrapped DOM node
+	 * @chainable
+	 * @example
+	// Insert a new element after #container
+	var containerEl = $('container');
+	var newEl = DOM.create('div', { id: 'helloWorld' });
+	containerEl.insertAfter(newEl);
 	 */
 	insertAfter: function(newNode)
 	{
@@ -130,6 +196,11 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Append some HTML to the element
+	 * @method append
+	 * @param  {String}  html  HTML to append
+	 * @chainable
+	 * @example
+	$('container').append('<p>More content</p>');
 	 */
 	append: function(html)
 	{
@@ -144,7 +215,8 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get the position of this element
-	 * @return	Hash with x and y values
+	 * @method getPosition
+	 * @return	{Object} X and Y values
 	 */
 	getPosition: function()
 	{
@@ -163,8 +235,12 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Set a CSS style on this element
-	 * @param	Style to set
-	 * @param	New style value
+	 * @method setStyle
+	 * @param	{String} style  Style to set
+	 * @param	{mixed}  value  New style value
+	 * @chainable
+	 * @example
+	$('container').setStyle('backgroundColor', 'red');
 	 */
 	setStyle: function(style, value)
 	{
@@ -175,7 +251,14 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Set multiple CSS styles at once
-	 * @param	Hash of styles
+	 * @method setStyles
+	 * @param {Object} styles  Styles to set
+	 * @chainable
+	 * @example
+	$('container').setStyles({
+		backgroundColor: red,
+		fontSize: '18px'
+	});
 	 */
 	setStyles: function(styles)
 	{
@@ -188,8 +271,13 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Check if this element has the specified CSS class name
-	 * @param	Class name to look for
-	 * @return	Whether this element has this class name as one of its classes
+	 * @method hasClass
+	 * @param	{String} name Class name to look for
+	 * @return	{Boolean} Whether this element has this class name as one of its classes
+	 * @example
+	// HTML contains: <div id="test" class="hello">...</div>
+	$('test').hasClass('blah'); // false
+	$('test').hasClass('hello'); // true
 	 */
 	hasClass: function(name)
 	{
@@ -198,7 +286,9 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Add the specified class name to this element
-	 * @param	Class name to add
+	 * @method addClass
+	 * @param	{String} name Class name to add
+	 * @chainable
 	 */
 	addClass: function(name)
 	{
@@ -208,7 +298,9 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Remove the specified class name from this element
-	 * @param	Class name to remove
+	 * @method removeClass
+	 * @param	{String} name Class name to remove
+	 * @chainable
 	 */
 	removeClass: function(name)
 	{
@@ -223,9 +315,10 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get the first child element by tag name, or null if there is no matching child
-	 * @param	Tag name to get
-	 * @param	Whether to wrap the element or not. Optional, default is true
-	 * @return	The element, or a wrapper around it if wrap is true.
+	 * @method firstByTag
+	 * @param	{String} tag Tag name to get
+	 * @param	{Boolean} [wrap=true] Whether to wrap the element or not. Optional, default is true
+	 * @return	{ElementWrapper|HTMLElement} The element, or a wrapper around it if wrap is true.
 	 */
 	firstByTag: function(tag, wrap)
 	{
@@ -238,9 +331,10 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get all children by tag name
-	 * @param	Tag name to get
-	 * @param	Whether to wrap the element or not. Optional, default is true
-	 * @return	An array of element, or wrappers around them if wrap is true.
+	 * @method getByTag
+	 * @param	{String} tag Tag name to get
+	 * @param	{Boolean} [wrap=true] Whether to wrap the elements or not. Optional, default is true
+	 * @return	{Array of ElementWrapper|Array of HTMLElement} The elements, or wrappers around them if wrap is true.
 	 */
 	getByTag: function(tag, wrap)
 	{
@@ -253,9 +347,10 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get the first child element by class name, or null if there is no matching child
-	 * @param	Tag name to get
-	 * @param	Whether to wrap the element or not. Optional, default is true
-	 * @return	The element, or a wrapper around it if wrap is true.
+	 * @method firstByClass
+	 * @param	{String} className Class name to look for
+	 * @param	{Boolean} [wrap=true] Whether to wrap the element or not. Optional, default is true
+	 * @return	{ElementWrapper|HTMLElement} The element, or a wrapper around it if wrap is true.
 	 */
 	firstByClass: function(className, wrap)
 	{
@@ -268,9 +363,10 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get all children by class name
-	 * @param	Class name to get
-	 * @param	Whether to wrap the element or not. Optional, default is true
-	 * @return	An array of element, or wrappers around them if wrap is true.
+	 * @method getByClass
+	 * @param	{String} className Class name to look for
+	 * @param	{Boolean} [wrap=true] Whether to wrap the elements or not. Optional, default is true
+ 	 * @return	{Array of ElementWrapper|Array of HTMLElement} The elements, or wrappers around them if wrap is true.
 	 */
 	getByClass: function(className, wrap)
 	{
@@ -284,6 +380,11 @@ ElementWrapper.prototype =
 	/**
 	 * Internal function for getting elements by class name. Don't use externally (use getByClass
 	 * instead)
+	 * @method _getByClass
+	 * @param  {HTMLElement} el        Element to search the children of
+	 * @param  {String}      className Name of the class to search for
+	 * @return {Array of HTMLElement} The matching elements
+	 * @private
 	 */
 	_getByClass: (function()
 	{
@@ -325,12 +426,15 @@ ElementWrapper.prototype =
 	})(),
 	
 	/**
-	 * Get the first child element by a selector or null if there is no matching child
-	 * @param	Tag name to get
-	 * @param	Whether to wrap the element or not. Optional, default is true
+	 * Get the first child element by a selector or null if there is no matching child. Incomplete
+	 * as there's not yet full IE support.
+	 * @method firstBySelector
+	 * @param	{String} selectors Selector to use
+ 	 * @param	{Boolean} [wrap=true] Whether to wrap the elements or not. Optional, default is true
 	 * @return	The element, or a wrapper around it if wrap is true.
+	 * @beta
 	 */
-	firstBySelector: function(className, wrap)
+	firstBySelector: function(selectors, wrap)
 	{
 		if (wrap == undefined)
 			wrap = true;
@@ -341,10 +445,12 @@ ElementWrapper.prototype =
 	},
 	
 	/**
-	 * Get all children by selector
-	 * @param	Selector to use
-	 * @param	Whether to wrap the element or not. Optional, default is true
-	 * @return	An array of element, or wrappers around them if wrap is true.
+	 * Get all children by selector. Incomplete as there's not yet full IE support.
+	 * @method getBySelector
+	 * @param	{String} selectors Selector to use
+ 	 * @param	{Boolean} [wrap=true] Whether to wrap the elements or not. Optional, default is true
+ 	 * @return	{Array of ElementWrapper|Array of HTMLElement} The elements, or wrappers around them if wrap is true.
+ 	 * @beta
 	 */
 	getBySelector: function(selectors, wrap)
 	{
@@ -360,7 +466,8 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get all the children of this element
-	 * @return Array of the children
+	 * @method children
+	 * @return {Array of ElementWrapper} The children
 	 */
 	children: function()
 	{
@@ -369,9 +476,10 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get the parent element of this element. If a tag name is passed, get the first parent that
-	 * matches this tag name.
-	 * @param	String		Name of tag to look for
-	 * @param	The parent element
+	 * matches this tag name, traversing the tree
+	 * @method parent
+	 * @param	{String} [tagName=null] Name of tag to look for, or null to just get the first ancestor
+	 * @return {ElementWrapper} The parent element
 	 */
 	parent: function(tagName)
 	{
@@ -388,6 +496,8 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get the sibling element before this one
+	 * @method previous
+	 * @return {ElementWrapper} The previous element, or null if there's none.
 	 */
 	previous: (function()
 	{
@@ -418,6 +528,8 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Get the sibling element after this one
+	 * @method next
+	 * @return {ElementWrapper} The next element, or null if there's none.
 	 */
 	next: (function()
 	{
@@ -448,6 +560,7 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Remove this element from the DOM.
+	 * @method remove
 	 */
 	remove: function()
 	{
@@ -461,7 +574,9 @@ ElementWrapper.prototype =
 	
 	/**
 	 * Add a child to the start of this element
-	 * @param	New element to add
+	 * @method prependChild
+	 * @param	{ElementWrapper|HTMLElement} New element to add
+	 * @chainable
 	 */
 	prependChild: function(newNode)
 	{
@@ -472,21 +587,46 @@ ElementWrapper.prototype =
 		return this;
 	},
 	
+	/**
+	 * Clone this element
+	 * @method cloneNode
+	 * @param  {Boolean} deep Whether to perform a deep clone
+	 * @return {ElementWrapper} The cloned node
+	 */
 	cloneNode: function(deep)
 	{
 		return new ElementWrapper(this.element.cloneNode(deep));
 	},
 	
 	/***** Normal DOM method wrappers *****/
+	/**
+	 * Set the value of the specified attribute
+	 * @method setAttribute
+	 * @param  {String} attribute Attribute to set
+	 * @param  {mixed} value Value to set attribute to
+	 * @chainable
+	 */
 	setAttribute: function(attribute, value)
 	{
 		this.element.setAttribute(attribute, value);
 		return this;
 	},
+	/**
+	 * Get the value of the specified attribute
+	 * @method getAttribute
+	 * @param  {String} attribute Attribute to get
+	 * @return {mixed}  Attribute's value
+	 */
 	getAttribute: function(attribute)
 	{
 		return this.element.getAttribute(attribute);
 	},
+	/**
+	 * Append a new child to the end of this element
+	 * @method appendChild
+	 * @param  {ElementWrapper|HTMLElement} newNode Node to append
+	 * @chainable
+	 */
 	appendChild: function(newNode)
 	{
 		if (newNode instanceof ElementWrapper)
@@ -496,6 +636,12 @@ ElementWrapper.prototype =
 		return this;
 	},
 	
+	/**
+	 * Remove the specified child from this element
+	 * @method removeChild
+	 * @param  {ElementWrapper|HTMLElement} node Child node to remove
+	 * @chainable
+	 */
 	removeChild: function(node)
 	{
 		if (node instanceof ElementWrapper)
@@ -513,7 +659,21 @@ function $(el) { return DOM.wrap(el); }
 
 /**
  * List containing multiple elements, similar to an array. Allows calling methods like setStyle and
- * addClass, which automatically call this method on every element in the list
+ * addClass, which automatically call this method on every element in the list. Immutable.
+ * Available methods include:
+ * 
+ * - {{#crossLink "ElementWrapper/addClass"}}{{/crossLink}}
+ * - {{#crossLink "ElementWrapper/remove"}}{{/crossLink}}
+ * - {{#crossLink "ElementWrapper/removeClass"}}{{/crossLink}}
+ * - {{#crossLink "ElementWrapper/set"}}{{/crossLink}}
+ * - {{#crossLink "ElementWrapper/setAttribute"}}{{/crossLink}}
+ * - {{#crossLink "ElementWrapper/setStyle"}}{{/crossLink}}
+ * - {{#crossLink "ElementWrapper/setStyles"}}{{/crossLink}}
+ * 
+ * @class ElementWrapperList
+ * @constructor
+ * @module JSFramework
+ * @submodule DOM
  */
 function ElementWrapperList(items)
 {
@@ -521,13 +681,19 @@ function ElementWrapperList(items)
 	for (var i = 0, count = items.length; i < count; i++)
 		this[i] = DOM.wrap(items[i]);
 	
+	/**
+	 * Number of items in this list
+	 * @property length
+	 * @type Integer
+	 */
 	this.length = items.length;
 }
 
 ElementWrapperList.prototype = {
 	/**
-	 * Convert this list into a proper array
-	 * @return	Array	An array with the same elements as this list
+	 * Convert this list into a proper array.
+	 * @method toArray
+	 * @return	{Array}	An array with the same elements as this list
 	 */
 	toArray: function()
 	{
