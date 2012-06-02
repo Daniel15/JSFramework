@@ -5,8 +5,9 @@ Simple JavaScript framework I use when I don't need a heavyweight framework like
 contains a very limited feature set (mostly AJAX) which won't be growing much. In general, I aim to
 support IE 6 and above, as well as the latest versions of Opera, Firefox and Chrome.
 
-This documentation is most likely out of date, please refer to the code and unit tests for the 
-latest features. The documentation will be updated when I get a chance to.
+Automatically generated API documentation is available at http://dan.cx/projects/jsframework/docs/,
+this is most likely more up-to-date than the information in this README. Please refer to the code 
+and unit tests for the latest features.
 
 Features
 ========
