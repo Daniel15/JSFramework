@@ -12,7 +12,7 @@
 	 * @constructor
 	 * @module JSFramework
 	 * @submodule Class
-	 * @param	{Object} Functions to add to the class
+	 * @param	{Object} proto Functions to add to the class
 	 * @return	{Class}  Class instance
 	 * @example
 	// Creation
