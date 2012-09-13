@@ -195,6 +195,23 @@
 		},
 		
 		/**
+		 * Insert a DOM node before node
+		 * @method insertBefore
+		 * @param  {ElementWrapper} Wrapped DOM node
+		 * @chainable
+		 * @example
+		// Insert a new element before #container
+		var containerEl = $('container');
+		var newEl = DOM.create('div', { id: 'helloWorld' });
+		containerEl.insertBefore(newEl);
+		 */
+		insertBefore: function(newNode)
+		{
+			this.element.parentNode.insertBefore(newNode.element || newNode, this.element);
+			return this;
+		},
+		
+		/**
 		 * Append some HTML to the element
 		 * @method append
 		 * @param  {String}  html  HTML to append
