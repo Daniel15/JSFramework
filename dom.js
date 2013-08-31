@@ -111,6 +111,38 @@
 			return new ElementWrapperList(input);
 		},
 		
+		/**
+		 * Get the first child element by name, or null if there is no matching child
+		 * @method firstByName
+		 * @param	{String} name Field name to get
+		 * @param	{Boolean} [wrap=true] Whether to wrap the element or not. Optional, default is true
+		 * @return	{ElementWrapper|HTMLElement} The element, or a wrapper around it if wrap is true.
+		 */
+		firstByName: function(name, wrap)
+		{
+			if (wrap == undefined)
+				wrap = true;
+
+			var els = this.getByName(name, false);
+			return els && els[0] && (wrap ? DOM.wrap(els[0]) : els[0]);
+		},
+
+		/**
+		 * Get all children by name
+		 * @method getByName
+		 * @param	{String} name Field name to get
+		 * @param	{Boolean} [wrap=true] Whether to wrap the elements or not. Optional, default is true
+		 * @return	{Array of ElementWrapper|Array of HTMLElement} The elements, or wrappers around them if wrap is true.
+		 */
+		getByName: function(name, wrap)
+		{
+			if (wrap == undefined)
+				wrap = true;
+
+			var els = document.getElementsByName(name);
+			return wrap ? DOM.wrapAll(els) : els;
+		},
+		
 		// Set below ElementWrapper, here just to make YUIDoc happy
 		/**
 		 * Body of the page
@@ -741,6 +773,20 @@
 		toArray: function()
 		{
 			return Array.prototype.slice.call(this);
+		},
+		
+		/**
+		 * Filter this element list to only include elements that match the specified predicate
+		 *
+		 * @method filter
+		 * @param  {Function} fn Predicate to test each element against
+		 * @chainable
+		 *
+		 */
+		filter: function(fn)
+		{
+			var matchingEls = Array.prototype.filter.call(this, fn);
+			return new ElementWrapperList(matchingEls);
 		}
 	};
 
