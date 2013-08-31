@@ -188,3 +188,22 @@ if (!Object.create)
 		return new F();
 	};
 }
+
+
+// Based off https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+if (!Array.prototype.filter)
+{
+	Array.prototype.filter = function(fn, thisObj)
+	{
+		var results = [];
+		for (var i = 0, count = this.length; i < count; i++)
+		{
+			if (fn.call(thisObj, this[i], i, this))
+			{
+				results.push(this[i]);
+			}
+		}
+
+		return results;
+	};
+}
